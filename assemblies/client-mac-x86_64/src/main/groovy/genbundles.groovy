@@ -34,7 +34,7 @@ for (bundle in bundles.dependencySet.bundle ) {
       bundleId = bundleId.substring(0,idx);
     }
     
-	lines.add(bundleId + "," + bundleVersion + ",plugins/" + id + "_" + version + ".jar," + startLevel + "," + autoStart);
+	lines.add(bundleId + "," + bundleVersion + ",plugins/" + bundleId + "_" + version + ".jar," + startLevel + "," + autoStart);
 }
 
 for (bundle in bundles.manual.bundle ) {

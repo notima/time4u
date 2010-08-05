@@ -10,4 +10,4 @@ Bundle-ClassPath: target/dependency/derby.jar,
 Export-Package: de.objectcode.time4u.client.store.derby,
  org.apache.derby.jdbc
 Bundle-ActivationPolicy: lazy
-Require-Bundle: de.objectcode.time4u.client.store.backend;bundle-version="0.9.9"
+Require-Bundle: de.objectcode.time4u.client.store.backend;bundle-version="1.0.1"

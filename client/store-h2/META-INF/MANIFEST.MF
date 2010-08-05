@@ -10,4 +10,4 @@ Bundle-ClassPath: .,
 Export-Package: de.objectcode.time4u.client.store.h2,
  org.h2
 Bundle-ActivationPolicy: lazy
-Require-Bundle: de.objectcode.time4u.client.store.backend;bundle-version="0.9.9"
+Require-Bundle: de.objectcode.time4u.client.store.backend;bundle-version="1.0.1"
