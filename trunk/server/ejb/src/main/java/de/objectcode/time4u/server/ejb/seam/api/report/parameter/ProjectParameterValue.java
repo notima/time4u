@@ -12,6 +12,7 @@ public class ProjectParameterValue extends BaseParameterValue
   private static final long serialVersionUID = 2152381811591513728L;
 
   private final List<String> m_projectStack;
+  private IFilter m_filter;
 
   public ProjectParameterValue(final String name, final String label)
   {
@@ -71,10 +72,12 @@ public class ProjectParameterValue extends BaseParameterValue
   public IFilter getFilter()
   {
     if (m_projectStack.size() > 0) {
-      final String projectId = m_projectStack.get(m_projectStack.size() - 1);
-      return ProjectFilter.filterProject(projectId);
+      if(m_filter == null){	
+        final String projectId = m_projectStack.get(m_projectStack.size() - 1);
+        m_filter = ProjectFilter.filterProject(projectId);
+      }
     }
-    return null;
+    return m_filter;
   }
 
 }

@@ -10,7 +10,7 @@
 				&lt;
 			</ui:repeat>
 			<h:selectOneMenu value="#{parameter.projectId}" required="false">
-				<s:selectItems value="#{ProjectService.getChildProjects(parameter.projectId)}"
+				<s:selectItems value="#{ProjectService.getChildProjects(parameter.projectId, false, true)}"
 					var="project" itemValue="#{project.id}" label="#{project.name}" hideNoSelection="false" noSelectionLabel="*no project*"/>
 				<f:selectItem itemLabel="*parent*" itemValue="parent" />
 				<a4j:support event="onchange" reRender="panel"/>

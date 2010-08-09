@@ -1,8 +1,10 @@
 package de.objectcode.time4u.server.ejb.seam.impl;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,11 +23,13 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.security.Identity;
 
 import de.objectcode.time4u.server.ejb.seam.api.IReportServiceLocal;
+import de.objectcode.time4u.server.ejb.seam.api.filter.ProjectFilter;
 import de.objectcode.time4u.server.ejb.seam.api.report.BaseReportDefinition;
 import de.objectcode.time4u.server.ejb.seam.api.report.CrossTableResult;
 import de.objectcode.time4u.server.ejb.seam.api.report.IReportDataCollector;
 import de.objectcode.time4u.server.ejb.seam.api.report.ReportResult;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.BaseParameterValue;
+import de.objectcode.time4u.server.ejb.seam.api.report.parameter.ProjectParameterValue;
 import de.objectcode.time4u.server.ejb.util.ReportEL;
 import de.objectcode.time4u.server.entities.DayInfoEntity;
 import de.objectcode.time4u.server.entities.PersonEntity;
@@ -57,6 +61,7 @@ public class ReportServiceSeam implements IReportServiceLocal
   {
     final UserAccountEntity userAccount = m_manager.find(UserAccountEntity.class, m_identity.getPrincipal().getName());
     final Set<String> allowedPersonIds = new HashSet<String>();
+    List<String> mainProjectidWithChildIds = new ArrayList<String>();
 
     allowedPersonIds.add(userAccount.getPerson().getId());
     for (final TeamEntity team : userAccount.getPerson().getResponsibleFor()) {
@@ -80,7 +85,7 @@ public class ReportServiceSeam implements IReportServiceLocal
         queryStr.append("select distinct d from ");
         queryStr.append(DayInfoEntity.class.getName());
         queryStr
-            .append(" d left outer join fetch d.tags left outer join fetch d.workItems join fetch d.person where d.person.id in (:allowedPersons)");
+        .append(" d left outer join fetch d.tags left outer join fetch d.workItems join fetch d.person where d.person.id in (:allowedPersons)");
         orderStr = " order by d.date asc";
         if (reportDefinition.isFill()) {
           rowDataIterator = new DayInfoRowDataIteratorWithFill();
@@ -102,6 +107,13 @@ public class ReportServiceSeam implements IReportServiceLocal
     for (final Map.Entry<String, BaseParameterValue> parameter : parameters.entrySet()) {
       context.getVariableMapper().setVariable(parameter.getKey(),
           ReportEL.getExpressionFactory().createValueExpression(parameter.getValue(), Object.class));
+      if(parameter.getKey().equalsIgnoreCase("project")){
+        List<String> ids = ((ProjectParameterValue)parameter.getValue()).getProjectStack();
+        String id = ids.get(ids.size()-1);
+        mainProjectidWithChildIds.add(id);
+        mainProjectidWithChildIds.addAll(getAllChildProjectIds(id));
+        ((ProjectFilter)parameter.getValue().getFilter()).setMainProjectidWithChildIds(mainProjectidWithChildIds);
+      }
     }
 
     if (reportDefinition.getFilter() != null) {
@@ -115,6 +127,7 @@ public class ReportServiceSeam implements IReportServiceLocal
     final Query query = m_manager.createQuery(queryStr.toString());
 
     query.setParameter("allowedPersons", allowedPersonIds);
+
     if (reportDefinition.getFilter() != null) {
       reportDefinition.getFilter().setQueryParameters(reportDefinition.getEntityType(), query, parameters, context);
     }
@@ -126,6 +139,30 @@ public class ReportServiceSeam implements IReportServiceLocal
     m_manager.clear();
 
     return dataCollector.getReportResult();
+  }
+
+  private List<String> getAllChildProjectIds(String id) {
+
+    List<String> childIds = new ArrayList<String>();
+
+    StringBuffer queryString = new StringBuffer();
+    queryString.append("from ");
+    queryString.append(ProjectEntity.class.getName());
+    queryString.append(" where parent.id = (:parentId)");
+
+    Query query = m_manager.createQuery(queryString.toString());
+
+    query.setParameter("parentId", id);
+    List<ProjectEntity> projectEntities = query.getResultList();
+
+    if(projectEntities != null && !projectEntities.isEmpty()){
+      for(ProjectEntity pe : projectEntities){
+        childIds.add(pe.getId());
+        childIds.addAll(getAllChildProjectIds(pe.getId()));
+      }
+    }
+
+    return childIds;
   }
 
   @SuppressWarnings("unchecked")
