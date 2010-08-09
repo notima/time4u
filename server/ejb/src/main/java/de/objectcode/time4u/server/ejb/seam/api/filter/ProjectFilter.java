@@ -1,6 +1,8 @@
 package de.objectcode.time4u.server.ejb.seam.api.filter;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
@@ -21,6 +23,7 @@ public class ProjectFilter implements IFilter
 
   private String m_projectId;
   private String m_projectIdExpression;
+  private List<String> m_mainProjectidWithChildIds;
 
   public ProjectFilter()
   {
@@ -53,6 +56,16 @@ public class ProjectFilter implements IFilter
     m_projectIdExpression = projectIdExpression;
   }
 
+
+  public List<String> getMainProjectidWithChildIds() {
+    return m_mainProjectidWithChildIds;
+  }
+
+  public void setMainProjectidWithChildIds(
+      List<String> mainProjectidWithChildIds) {
+    this.m_mainProjectidWithChildIds = mainProjectidWithChildIds;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -61,9 +74,9 @@ public class ProjectFilter implements IFilter
   {
     switch (entityType) {
       case WORKITEM:
-        return "(w.project.id = :projectId)";
+        return "(w.project.id in (:projectIds))";
       case TODO:
-        return "(t.task.project.id = :projectId)";
+        return "(t.task.project.id in (:projectIds))";
       default:
         throw new RuntimeException("PersonFilter not applicable for entity type: " + entityType);
     }
@@ -81,7 +94,7 @@ public class ProjectFilter implements IFilter
       query.setParameter("projectId", factory.createValueExpression(context, m_projectIdExpression, String.class)
           .getValue(context));
     } else {
-      query.setParameter("projectId", m_projectId);
+      query.setParameter("projectIds", m_mainProjectidWithChildIds);
     }
   }
 
