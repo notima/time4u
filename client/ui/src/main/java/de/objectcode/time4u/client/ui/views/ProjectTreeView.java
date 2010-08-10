@@ -28,6 +28,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
+import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.store.api.event.IRepositoryListener;
 import de.objectcode.time4u.client.store.api.event.RepositoryEvent;
@@ -37,7 +38,9 @@ import de.objectcode.time4u.client.ui.UIPlugin;
 import de.objectcode.time4u.client.ui.actions.ProjectActionDelegate;
 import de.objectcode.time4u.client.ui.dialogs.ProjectCopyDialog;
 import de.objectcode.time4u.client.ui.dialogs.ProjectMoveDialog;
+import de.objectcode.time4u.client.ui.dialogs.TaskMoveDialog;
 import de.objectcode.time4u.client.ui.dnd.ProjectTransfer;
+import de.objectcode.time4u.client.ui.dnd.TaskTransfer;
 import de.objectcode.time4u.client.ui.provider.ProjectContentProvider;
 import de.objectcode.time4u.client.ui.provider.ProjectLabelProvider;
 import de.objectcode.time4u.client.ui.util.CompoundSelectionEntityType;
@@ -45,6 +48,7 @@ import de.objectcode.time4u.client.ui.util.CompoundSelectionProvider;
 import de.objectcode.time4u.client.ui.util.SelectionServiceAdapter;
 import de.objectcode.time4u.server.api.data.Project;
 import de.objectcode.time4u.server.api.data.ProjectSummary;
+import de.objectcode.time4u.server.api.data.Task;
 import de.objectcode.time4u.server.api.data.WorkItem;
 
 public class ProjectTreeView extends ViewPart implements IRepositoryListener
@@ -96,7 +100,7 @@ public class ProjectTreeView extends ViewPart implements IRepositoryListener
       {
         try {
           final IHandlerService handlerService = (IHandlerService) getSite().getWorkbenchWindow().getWorkbench()
-              .getService(IHandlerService.class);
+          .getService(IHandlerService.class);
 
           handlerService.executeCommand(ICommandIds.CMD_PROJECT_EDIT, null);
         } catch (final Exception e) {
@@ -105,7 +109,7 @@ public class ProjectTreeView extends ViewPart implements IRepositoryListener
       }
     });
     m_viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT, new Transfer[] {
-      ProjectTransfer.getInstance()
+        ProjectTransfer.getInstance()
     }, new DragSourceAdapter() {
       @Override
       public void dragSetData(final DragSourceEvent event)
@@ -115,58 +119,92 @@ public class ProjectTreeView extends ViewPart implements IRepositoryListener
       }
     });
     m_viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT, new Transfer[] {
-      ProjectTransfer.getInstance()
+        ProjectTransfer.getInstance(), TaskTransfer.getInstance()
     }, new DropTargetAdapter() {
       @Override
       public void drop(final DropTargetEvent event)
       {
-        if (event.data == null || !(event.data instanceof ProjectSummary)) {
+        if (event.data == null ) {
           return;
         }
         ProjectSummary newParent = null;
         if (event.item != null && event.item.getData() != null && event.item.getData() instanceof ProjectSummary) {
           newParent = (ProjectSummary) event.item.getData();
         }
-        try {
-          final Project project = RepositoryFactory.getRepository().getProjectRepository().getProject(
-              ((ProjectSummary) event.data).getId());
 
-          if ((event.detail & DND.DROP_MOVE) != 0) {
-            final ProjectMoveDialog dialog = new ProjectMoveDialog(getSite(), project, newParent);
+        if(event.data instanceof ProjectSummary){
 
-            if (dialog.open() == ProjectMoveDialog.OK) {
-              newParent = dialog.getNewParent();
-              // Test for a look (i.e. dragging a parent to one of its own children)
-              ProjectSummary current = newParent;
-              while (current != null) {
-                if (current.getId().equals(project.getId())) {
-                  // We have loop
-                  return;
+          try {
+            final Project project = RepositoryFactory.getRepository().getProjectRepository().getProject(
+                ((ProjectSummary) event.data).getId());
+
+            if ((event.detail & DND.DROP_MOVE) != 0) {
+              final ProjectMoveDialog dialog = new ProjectMoveDialog(getSite(), project, newParent);
+
+              if (dialog.open() == ProjectMoveDialog.OK) {
+                newParent = dialog.getNewParent();
+                // Test for a look (i.e. dragging a parent to one of its own children)
+                ProjectSummary current = newParent;
+                while (current != null) {
+                  if (current.getId().equals(project.getId())) {
+                    // We have loop
+                    return;
+                  }
+                  if (current.getParentId() != null) {
+                    current = RepositoryFactory.getRepository().getProjectRepository().getProjectSummary(
+                        current.getParentId());
+                  } else {
+                    current = null;
+                  }
                 }
-                if (current.getParentId() != null) {
-                  current = RepositoryFactory.getRepository().getProjectRepository().getProjectSummary(
-                      current.getParentId());
-                } else {
-                  current = null;
-                }
+
+                project.setParentId(newParent != null ? newParent.getId() : null);
+
+                RepositoryFactory.getRepository().getProjectRepository().storeProject(project, true);
+              }
+            } else if ((event.detail & DND.DROP_COPY) != 0) {
+              final ProjectCopyDialog dialog = new ProjectCopyDialog(getSite(), project, newParent);
+
+              if (dialog.open() == ProjectCopyDialog.OK) {
+                ProjectActionDelegate.copyProject(project, dialog.getNewName(), dialog.getNewParent(), dialog
+                    .isCopyTasks(), dialog.isCopySubProjects());
               }
 
-              project.setParentId(newParent != null ? newParent.getId() : null);
-
-              RepositoryFactory.getRepository().getProjectRepository().storeProject(project, true);
             }
-          } else if ((event.detail & DND.DROP_COPY) != 0) {
-            final ProjectCopyDialog dialog = new ProjectCopyDialog(getSite(), project, newParent);
-
-            if (dialog.open() == ProjectCopyDialog.OK) {
-              ProjectActionDelegate.copyProject(project, dialog.getNewName(), dialog.getNewParent(), dialog
-                  .isCopyTasks(), dialog.isCopySubProjects());
-            }
-
+          } catch (final Exception e) {
+            UIPlugin.getDefault().log(e);
           }
-        } catch (final Exception e) {
-          UIPlugin.getDefault().log(e);
+        }else if(event.data instanceof TaskTransfer.ProjectTask){
+
+          if ((event.detail & DND.DROP_MOVE) != 0) {
+
+            final TaskTransfer.ProjectTask projectTask = ((TaskTransfer.ProjectTask)event.data);
+
+            Task task;
+            try {
+              final String taskId = projectTask.getTask().getId();
+
+              task = RepositoryFactory.getRepository().getTaskRepository().getTask(taskId);
+              final TaskMoveDialog taskMoveDialog = new TaskMoveDialog(getSite(), task, newParent);
+
+              if(taskMoveDialog.open() == TaskMoveDialog.OK){
+                newParent = taskMoveDialog.getNewParent();
+                
+                final String projectId = newParent.getId();
+                
+                if(task.getProjectId().equals(projectId)){
+                  return;
+                }
+                task.setProjectId(projectId);
+                
+                RepositoryFactory.getRepository().getTaskRepository().storeTask(task, true);
+              }
+              } catch (RepositoryException e) {
+                UIPlugin.getDefault().log(e);
+              }
+           }
         }
+
       }
 
       @Override
