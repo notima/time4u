@@ -555,6 +555,14 @@
                menubarPath="objectGroup"
                tooltip="%action.workItem.edit.tooltip">
          </action>
+         <action
+               class="de.objectcode.time4u.client.ui.actions.WorkItemActionDelegate"
+               icon="icons/CopyWorkItem.gif"
+               id="de.objectcode.time4u.client.ui.workitem.copy"
+               label="%action.workItem.copy.label"
+               menubarPath="objectGroup"
+               tooltip="%action.workItem.copy.tooltip">
+         </action>         
       </viewerContribution>
       <viewerContribution
             id="de.objectcode.time4u.client.ui.view..calendarViewContribution1"
@@ -1027,6 +1035,32 @@
                </and>
             </enablement>
          </action>
+         <action
+               class="de.objectcode.time4u.client.ui.actions.WorkItemActionDelegate"
+               definitionId="de.objectcode.time4u.client.ui.workitem.copy"
+               icon="icons/CopyWorkItem.gif"
+               id="de.objectcode.time4u.client.ui.workitem.copy"
+               label="%action.workItem.copy.label"
+               menubarPath="workItemMenu/workItemGroup"
+               style="push"
+               toolbarPath="workItem/additions"
+               tooltip="%action.workItem.copy.tooltip">
+            <enablement>
+               <and>
+                  <objectClass
+                        name="de.objectcode.time4u.client.ui.util.CompoundSelection">
+                  </objectClass>
+                  <objectState
+                        name="has"
+                        value="WORKITEM">
+                  </objectState>
+                  <objectState
+                        name="WORKITEM.active"
+                        value="false">
+                  </objectState>                  
+               </and>
+            </enablement>
+         </action>         
          <action
                class="de.objectcode.time4u.client.ui.actions.WorkItemActionDelegate"
                definitionId="de.objectcode.time4u.client.ui.workitem.new"

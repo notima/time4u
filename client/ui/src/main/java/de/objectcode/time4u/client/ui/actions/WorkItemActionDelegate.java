@@ -13,9 +13,11 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
+import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.ui.UIPlugin;
 import de.objectcode.time4u.client.ui.dialogs.WorkItemDialog;
+import de.objectcode.time4u.client.ui.dialogs.WorkitemCopyDialog;
 import de.objectcode.time4u.client.ui.preferences.PreferenceConstants;
 import de.objectcode.time4u.client.ui.util.DateFormat;
 import de.objectcode.time4u.client.ui.util.TimeFormat;
@@ -155,6 +157,21 @@ public class WorkItemActionDelegate implements IWorkbenchWindowActionDelegate, I
       //      final WorkItemSearchDialog dialog = new WorkItemSearchDialog(m_shellProvider);
       //
       //      dialog.open();
+    } else if("de.objectcode.time4u.client.ui.workitem.copy".equals(id)){
+      final WorkitemCopyDialog workitemCopyDialog = new WorkitemCopyDialog(m_view.getSite(), selectedWorkItem);
+      
+      if(workitemCopyDialog.open() == WorkitemCopyDialog.OK){
+        final WorkItem copiedWorkIem = workitemCopyDialog.getCopiedWorkitem();
+        
+        if(selectedWorkItem.getDay().equals(copiedWorkIem.getDay())){
+          return;
+        }
+        try {
+          RepositoryFactory.getRepository().getWorkItemRepository().storeWorkItem(copiedWorkIem, true);
+        } catch (RepositoryException e) {
+         UIPlugin.getDefault().log(e);        }
+        
+      }
     }
   }
 
