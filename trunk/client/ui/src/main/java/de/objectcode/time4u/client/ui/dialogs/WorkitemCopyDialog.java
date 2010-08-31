@@ -2,13 +2,17 @@ package de.objectcode.time4u.client.ui.dialogs;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.IShellProvider;
-import org.eclipse.nebula.widgets.calendarcombo.CalendarCombo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,55 +23,49 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TableColumn;
 
+import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.ui.UIPlugin;
 import de.objectcode.time4u.client.ui.controls.DateCombo;
+import de.objectcode.time4u.client.ui.provider.WorkItemCopyAndDeleteDialogTableContentProvider;
+import de.objectcode.time4u.client.ui.provider.WorkItemCopyAndDeleteDialogTableLabelProvider;
 import de.objectcode.time4u.server.api.data.CalendarDay;
+
 import de.objectcode.time4u.server.api.data.WorkItem;
 
 public class WorkitemCopyDialog extends Dialog
 {
 
-  private WorkItem m_workitemToCopy;
-  private WorkItem m_copiedWorkitem;
-  private DateCombo m_dateCombo;
+  private List m_workitemsToCopy;
+  private List<WorkItem> m_copiedWorkitems;
+  private DateCombo m_toDateCombo;
 
-  public WorkitemCopyDialog(final IShellProvider shellProvider,final WorkItem workitemToCopy)
+  public WorkitemCopyDialog(final IShellProvider shellProvider,final List workitemsToCopy)
   {
     super(shellProvider);
 
-    setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE | getDefaultOrientation());
+    setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | getDefaultOrientation());
 
-    m_workitemToCopy = workitemToCopy;
+    m_copiedWorkitems = new ArrayList<WorkItem>();
+    m_workitemsToCopy = workitemsToCopy;
 
-    m_copiedWorkitem = new WorkItem();
-    m_copiedWorkitem.setBegin(workitemToCopy.getBegin());
-    m_copiedWorkitem.setEnd(workitemToCopy.getEnd());
-    m_copiedWorkitem.setComment(workitemToCopy.getComment());
-    m_copiedWorkitem.setProjectId(workitemToCopy.getProjectId());
-    m_copiedWorkitem.setTaskId(workitemToCopy.getTaskId());
-    m_copiedWorkitem.setTodoId(workitemToCopy.getTodoId());
+    for(Object obj : workitemsToCopy){
+      WorkItem workItemToCopy = (WorkItem)obj; 
+      WorkItem copiedWorkitem = new WorkItem();
 
-    //    Button okButton = getButton(IDialogConstants.OK_ID);
-    //    okButton.setEnabled(isSameDate()); 
-
+      copiedWorkitem.setBegin(workItemToCopy.getBegin());
+      copiedWorkitem.setEnd(workItemToCopy.getEnd());
+      copiedWorkitem.setComment(workItemToCopy.getComment());
+      copiedWorkitem.setProjectId(workItemToCopy.getProjectId());
+      copiedWorkitem.setTaskId(workItemToCopy.getTaskId());
+      copiedWorkitem.setTodoId(workItemToCopy.getTodoId());
+      m_copiedWorkitems.add(copiedWorkitem);
+    }
   }
-
-//  @Override
-//  protected Control createContents(Composite parent)
-//  {
-//    Control contents = super.createContents(parent);
-//
-//    Button okButton = getButton(IDialogConstants.OK_ID);
-//    okButton.setEnabled(!isSameDate()); 
-//
-//    return contents;
-//  }
-
-  public WorkItem getCopiedWorkitem()
+  public List<WorkItem> getCopiedWorkitem()
   {
-    return m_copiedWorkitem;
+    return m_copiedWorkitems;
   }
   @Override
   protected Control createButtonBar(Composite parent)
@@ -90,28 +88,24 @@ public class WorkitemCopyDialog extends Dialog
   @Override
   protected Control createDialogArea(final Composite parent)
   {
-    final CalendarDay day = m_workitemToCopy.getDay();
-    String workItemDate = String.format("%1$td.%1$tm.%1$tY", day.getDate());
+    final CalendarDay day = ((WorkItem)m_workitemsToCopy.get(0)).getDay();
 
     final Composite composite = (Composite) super.createDialogArea(parent);
     final Composite root = new Composite(composite, SWT.NONE);
-    root.setLayout(new GridLayout(2, false));
-    root.setLayoutData(new GridData(GridData.FILL_BOTH));
+    root.setLayout(new GridLayout(4, false));
 
-    final Label nameLabel = new Label(root, SWT.NONE);
-    nameLabel.setText(UIPlugin.getDefault().getString("dialog.workitem.copy.workitem.date.name"));
-    final Text nameText = new Text(root, SWT.BORDER);
-    nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    final Label fromDateLbl = new Label(root, SWT.NONE);
+    fromDateLbl.setText(UIPlugin.getDefault().getString("dialog.workitem.copy.workitem.date.name"));
+    DateCombo fromDateCombo = new DateCombo(root, SWT.BORDER | SWT.READ_ONLY);
+    fromDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    fromDateCombo.select(day.getCalendar());
 
-    nameText.setText(workItemDate);
-    nameText.setEnabled(false);
-
-    final Label parentLabel = new Label(root, SWT.NONE);
-    parentLabel.setText(UIPlugin.getDefault().getString("dialog.workitem.copy.workitem.newdate.name"));
-    m_dateCombo = new DateCombo(root, SWT.BORDER);
-    m_dateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    m_dateCombo.select(Calendar.getInstance());
-    m_dateCombo.addSelectionListener(new SelectionAdapter() {
+    final Label toDateLbl = new Label(root, SWT.NONE);
+    toDateLbl.setText(UIPlugin.getDefault().getString("dialog.workitem.copy.workitem.newdate.name"));
+    m_toDateCombo = new DateCombo(root, SWT.BORDER );
+    m_toDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    m_toDateCombo.select(Calendar.getInstance());
+    m_toDateCombo.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(final SelectionEvent e)
       {
@@ -121,15 +115,58 @@ public class WorkitemCopyDialog extends Dialog
       }
     });
 
+    TableViewer tableViewer = new TableViewer(root, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
+
+    final TableLayout layout = new TableLayout();
+    layout.addColumnData(new ColumnWeightData(10, 50, true));
+    layout.addColumnData(new ColumnWeightData(10, 50, true));
+    layout.addColumnData(new ColumnWeightData(10, 50, true));
+    layout.addColumnData(new ColumnWeightData(15, 50, true));
+    layout.addColumnData(new ColumnWeightData(15, 50, true));
+    layout.addColumnData(new ColumnWeightData(30, 100, true));
+
+    tableViewer.getTable().setHeaderVisible(true);
+    tableViewer.getTable().setLinesVisible(true);
+    tableViewer.getTable().setLayout(layout);
+
+    GridData gridData = new GridData(GridData.FILL_BOTH);
+    gridData.horizontalSpan = 4;
+    gridData.widthHint = convertWidthInCharsToPixels(100);
+    tableViewer.getTable().setLayoutData(gridData);
+
+    final TableColumn beginColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+    beginColumn.setText("Begin");
+    beginColumn.setMoveable(false);
+    final TableColumn endColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+    endColumn.setText("End");
+    endColumn.setMoveable(false);
+    final TableColumn durationColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+    durationColumn.setText("Duration");
+    durationColumn.setMoveable(false);
+    final TableColumn projectColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+    projectColumn.setText("Project");
+    projectColumn.setMoveable(false);
+    final TableColumn taskColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+    taskColumn.setText("Task");
+    taskColumn.setMoveable(false);
+    final TableColumn commentColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
+    commentColumn.setText("Comment");
+    commentColumn.setMoveable(false);
+    
+    tableViewer.setContentProvider(new WorkItemCopyAndDeleteDialogTableContentProvider());
+    tableViewer.setLabelProvider(new WorkItemCopyAndDeleteDialogTableLabelProvider(RepositoryFactory.getRepository()));
+    
+    tableViewer.setInput(m_workitemsToCopy);
+  
     return composite;
   }
 
   private boolean isSameDate()
   {
-    Calendar calendar = m_dateCombo.getSelection();
+    Calendar calendar = m_toDateCombo.getSelection();
 
     String strNewDate = String.format("%1$tY-%1$tm-%1$td", calendar.getTime());
-    String strWorkItemDate = String.format("%1$tY-%1$tm-%1$td", m_workitemToCopy.getDay().getDate());
+    String strWorkItemDate = String.format("%1$tY-%1$tm-%1$td", ((WorkItem)m_workitemsToCopy.get(0)).getDay().getDate());
     SimpleDateFormat dateFormatter = new SimpleDateFormat("yy-MM-dd");
 
     Date newDate = null;
@@ -149,9 +186,10 @@ public class WorkitemCopyDialog extends Dialog
   @Override
   protected void okPressed()
   {
-    Calendar newDate = m_dateCombo.getSelection();
-
-    m_copiedWorkitem.setDay(new CalendarDay(newDate));
+    Calendar newDate = m_toDateCombo.getSelection();
+    for(WorkItem workitem :  m_copiedWorkitems){
+      workitem.setDay(new CalendarDay(newDate));
+    }
 
     super.okPressed();
   }

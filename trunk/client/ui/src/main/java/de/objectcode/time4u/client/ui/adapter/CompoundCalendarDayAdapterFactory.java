@@ -1,5 +1,7 @@
 package de.objectcode.time4u.client.ui.adapter;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdapterFactory;
 
 import de.objectcode.time4u.client.ui.util.CompoundSelection;
@@ -18,7 +20,8 @@ public class CompoundCalendarDayAdapterFactory implements IAdapterFactory
     final CompoundSelection selection = (CompoundSelection) adaptableObject;
 
     if (CalendarDay.class.isAssignableFrom(adapterType)) {
-      final Object sel = selection.getSelection(CompoundSelectionEntityType.CALENDARDAY);
+      List<Object> selectionList = (List)selection.getSelection(CompoundSelectionEntityType.CALENDARDAY);
+      final Object sel = selectionList.get(0);
 
       if (sel instanceof CalendarDay) {
         return sel;
