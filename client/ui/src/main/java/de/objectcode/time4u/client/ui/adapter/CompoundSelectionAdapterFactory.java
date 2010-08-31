@@ -1,6 +1,12 @@
 package de.objectcode.time4u.client.ui.adapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IActionFilter;
 
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
@@ -46,58 +52,92 @@ public class CompoundSelectionAdapterFactory implements IAdapterFactory
       if ("has".equals(name)) {
         return selection.getSelection(CompoundSelectionEntityType.valueOf(value)) != null;
       } else if ("PROJECT.active".equals(name)) {
-        final ProjectSummary project = (ProjectSummary) selection.getSelection(CompoundSelectionEntityType.PROJECT);
+        List projectSelection = (List)selection.getSelection(CompoundSelectionEntityType.PROJECT);
+        ProjectSummary project = null; 
+
+        if(projectSelection != null && !projectSelection.isEmpty()){
+
+          project = (ProjectSummary) projectSelection.get(0);
+        }
 
         if (project != null) {
           return Boolean.parseBoolean(value) == project.isActive();
         }
-      } else if ("TASK.active".equals(name)) {
-        final TaskSummary task = (TaskSummary) selection.getSelection(CompoundSelectionEntityType.TASK);
 
-        if (task != null) {
-          return Boolean.parseBoolean(value) == task.isActive();
+
+      } else if ("TASK.active".equals(name)) {
+        List taskSelection = (List)selection.getSelection(CompoundSelectionEntityType.TASK);
+
+        if(taskSelection != null && !taskSelection.isEmpty()){
+          final TaskSummary task = (TaskSummary)taskSelection.get(0);
+
+          if (task != null) {
+            return Boolean.parseBoolean(value) == task.isActive();
+          }
         }
       } else if ("WORKITEM.active".equals(name)) {
-        final WorkItem workItem = (WorkItem) selection.getSelection(CompoundSelectionEntityType.WORKITEM);
 
-        if (workItem != null) {
+        List workItemSelections = (List)selection.getSelection(CompoundSelectionEntityType.WORKITEM);
+
+        WorkItem workItem = null;
+        boolean containsActiveWorkitem = false;
+
+        if (workItemSelections != null && !workItemSelections.isEmpty()) {
           try {
             final WorkItem activeWorkItem = RepositoryFactory.getRepository().getWorkItemRepository()
-                .getActiveWorkItem();
+            .getActiveWorkItem();
 
-            return Boolean.parseBoolean(value) == (activeWorkItem != null && workItem.getId().equals(
-                activeWorkItem.getId()));
+            if(activeWorkItem != null){
+              for(Object sel : workItemSelections){
+                workItem = (WorkItem)sel;
+                if(workItem.getId().equals(
+                    activeWorkItem.getId())){
+                  containsActiveWorkitem = true;
+                  break;
+                }
+              }
+            }
           } catch (final Exception e) {
             UIPlugin.getDefault().log(e);
           }
         }
-      } else if ("TODO.hasTask".equals(name)) {
-        final TodoSummary todoSummary = (TodoSummary) selection.getSelection(CompoundSelectionEntityType.TODO);
+        return Boolean.parseBoolean(value) == containsActiveWorkitem;
 
-        if (todoSummary != null) {
-          try {
-            final Todo todo = RepositoryFactory.getRepository().getTodoRepository().getTodo(todoSummary.getId());
+      } else if("WORKITEM.useOnlyOneElement".equals(name)){ 
+        List workItemSelections = (List)selection.getSelection(CompoundSelectionEntityType.WORKITEM);
 
-            return Boolean.parseBoolean(value) == (todo != null && todo.getTaskId() != null);
-          } catch (final Exception e) {
-            UIPlugin.getDefault().log(e);
+        boolean onlyOneElement = Boolean.parseBoolean(value);
+        return (workItemSelections != null && !workItemSelections.isEmpty()) 
+        && ((onlyOneElement == false && workItemSelections.size() >= 1) || (onlyOneElement == true && workItemSelections.size() == 1));
+
+      } else if (name != null && name.matches("TODO")){ 
+
+        final List todoSelections = (List)selection.getSelection(CompoundSelectionEntityType.TODO);
+
+        if(todoSelections != null && !todoSelections.isEmpty()){
+          TodoSummary todoSummary = (TodoSummary)todoSelections.get(0);
+
+          if (todoSummary != null) {
+            if ("TODO.hasTask".equals(name)) {
+
+              try {
+                final Todo todo = RepositoryFactory.getRepository().getTodoRepository().getTodo(todoSummary.getId());
+
+                return Boolean.parseBoolean(value) == (todo != null && todo.getTaskId() != null);
+              } catch (final Exception e) {
+                UIPlugin.getDefault().log(e);
+              }
+            } else if ("TODO.group".equals(name)) {
+              return Boolean.parseBoolean(value) == todoSummary.isGroup();
+            }
+          } else if ("TODO.completed".equals(name)) {
+            return Boolean.parseBoolean(value) == todoSummary.isCompleted();
           }
-        }
-      } else if ("TODO.group".equals(name)) {
-        final TodoSummary todo = (TodoSummary) selection.getSelection(CompoundSelectionEntityType.TODO);
-
-        if (todo != null) {
-          return Boolean.parseBoolean(value) == todo.isGroup();
-        }
-      } else if ("TODO.completed".equals(name)) {
-        final TodoSummary todo = (TodoSummary) selection.getSelection(CompoundSelectionEntityType.TODO);
-
-        if (todo != null) {
-          return Boolean.parseBoolean(value) == todo.isCompleted();
         }
       }
-
       return false;
     }
   }
 }
+
+

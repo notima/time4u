@@ -103,7 +103,7 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
 
     m_pageBook = new PageBook(parent, SWT.NONE);
 
-    m_tableViewer = new TableViewer(m_pageBook, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.SINGLE
+    m_tableViewer = new TableViewer(m_pageBook, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.MULTI
         | SWT.FULL_SELECTION);
 
     final TableLayout layout = new TableLayout();

@@ -96,8 +96,8 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
     });
 
-    final CalendarDay selection = (CalendarDay) m_selectionProvider
-        .getSelection(CompoundSelectionEntityType.CALENDARDAY);
+    final CalendarDay selection = ((List<CalendarDay>)m_selectionProvider
+        .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
     Assert.isNotNull(selection);
 
     m_currentMonth = selection.getMonth();
@@ -141,8 +141,8 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
         menuMgr.add(new GroupMarker("calendarGroup"));
         menuMgr.add(new Separator());
         menuMgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-        final CalendarDay selection = (CalendarDay) m_selectionProvider
-            .getSelection(CompoundSelectionEntityType.CALENDARDAY);
+        final CalendarDay selection = ((List<CalendarDay>)m_selectionProvider
+        .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
         Assert.isNotNull(selection);
 
         try {

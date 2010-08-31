@@ -1,11 +1,15 @@
 package de.objectcode.time4u.client.ui.util;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
 public class CompoundSelection implements ISelection, IAdaptable
 {
@@ -18,10 +22,16 @@ public class CompoundSelection implements ISelection, IAdaptable
 
   public synchronized void setSelection(final CompoundSelectionEntityType type, final Object selection)
   {
+    List<Object> selections = new ArrayList<Object>();
     if (selection == null) {
       m_selections.remove(type);
     } else {
-      m_selections.put(type, selection);
+      if(selection instanceof IStructuredSelection){
+        selections.addAll(((IStructuredSelection)selection).toList());
+      } else if(selection instanceof Serializable){
+        selections.add(selection);
+      }
+      m_selections.put(type, selections);
     }
   }
 

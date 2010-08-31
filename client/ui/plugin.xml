@@ -301,7 +301,7 @@
          </property>
          <property
                name="windowImages"
-               value="icons/Time4U.gif,icons/Time4U_32.gif,icons/Time4U_48.gif,icons/Time4U_64.gif,icons/Time4U_128.gif">
+               value="/time4u-client-ui/icons/Time4U.gif,/time4u-client-ui/icons/Time4U_32.gif,/time4u-client-ui/icons/Time4U_48.gif,/time4u-client-ui/icons/Time4U_64.gif,/time4u-client-ui/icons/Time4U_128.gif">
          </property>
          <property
                name="startupForegroundColor"
@@ -535,6 +535,10 @@
                         name="WORKITEM.active"
                         value="false">
                   </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="false">
+                  </objectState>                     
                </and>
             </enablement>
          </action>
@@ -546,6 +550,21 @@
                label="%action.workItem.continue.label"
                menubarPath="objectGroup"
                tooltip="%action.workItem.continue.tooltip">
+            <enablement>
+               <and>
+                  <objectClass
+                        name="de.objectcode.time4u.client.ui.util.CompoundSelection">
+                  </objectClass>
+                  <objectState
+                        name="WORKITEM.active"
+                        value="false">
+                  </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="true">
+                  </objectState>                     
+               </and>
+            </enablement>               
          </action>
          <action
                class="de.objectcode.time4u.client.ui.actions.WorkItemActionDelegate"
@@ -554,6 +573,17 @@
                label="%action.workItem.edit.label"
                menubarPath="objectGroup"
                tooltip="%action.workItem.edit.tooltip">
+            <enablement>
+               <and>
+                  <objectClass
+                        name="de.objectcode.time4u.client.ui.util.CompoundSelection">
+                  </objectClass>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="true">
+                  </objectState>                     
+               </and>
+            </enablement>                  
          </action>
          <action
                class="de.objectcode.time4u.client.ui.actions.WorkItemActionDelegate"
@@ -562,6 +592,21 @@
                label="%action.workItem.copy.label"
                menubarPath="objectGroup"
                tooltip="%action.workItem.copy.tooltip">
+            <enablement>
+               <and>
+                  <objectClass
+                        name="de.objectcode.time4u.client.ui.util.CompoundSelection">
+                  </objectClass>
+                  <objectState
+                        name="WORKITEM.active"
+                        value="false">
+                  </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="false">
+                  </objectState>                     
+               </and>
+            </enablement>                 
          </action>         
       </viewerContribution>
       <viewerContribution
@@ -988,6 +1033,10 @@
                         name="WORKITEM.active"
                         value="false">
                   </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="false">
+                  </objectState>                     
                </and>
             </enablement>
          </action>
@@ -1010,6 +1059,10 @@
                         name="has"
                         value="WORKITEM">
                   </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="true">
+                  </objectState>                     
                </and>
             </enablement>
          </action>
@@ -1032,6 +1085,10 @@
                         name="has"
                         value="WORKITEM">
                   </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="true">
+                  </objectState>                     
                </and>
             </enablement>
          </action>
@@ -1057,7 +1114,11 @@
                   <objectState
                         name="WORKITEM.active"
                         value="false">
-                  </objectState>                  
+                  </objectState>
+                  <objectState
+                        name="WORKITEM.useOnlyOneElement"
+                        value="false">
+                  </objectState>                                       
                </and>
             </enablement>
          </action>         

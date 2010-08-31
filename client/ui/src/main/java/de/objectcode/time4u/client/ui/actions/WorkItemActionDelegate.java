@@ -1,5 +1,7 @@
 package de.objectcode.time4u.client.ui.actions;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -16,9 +18,12 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.ui.UIPlugin;
+import de.objectcode.time4u.client.ui.dialogs.WorkItemDeleteDialog;
 import de.objectcode.time4u.client.ui.dialogs.WorkItemDialog;
 import de.objectcode.time4u.client.ui.dialogs.WorkitemCopyDialog;
 import de.objectcode.time4u.client.ui.preferences.PreferenceConstants;
+import de.objectcode.time4u.client.ui.util.CompoundSelection;
+import de.objectcode.time4u.client.ui.util.CompoundSelectionEntityType;
 import de.objectcode.time4u.client.ui.util.DateFormat;
 import de.objectcode.time4u.client.ui.util.TimeFormat;
 import de.objectcode.time4u.client.ui.views.WorkItemView;
@@ -78,6 +83,8 @@ public class WorkItemActionDelegate implements IWorkbenchWindowActionDelegate, I
     final CalendarDay selectedDay = (CalendarDay) m_selection.getAdapter(CalendarDay.class);
     final WorkItem selectedWorkItem = (WorkItem) m_selection.getAdapter(WorkItem.class);
 
+    final List selectedWorkItems = (List)((CompoundSelection)m_selection).getSelection(CompoundSelectionEntityType.WORKITEM);
+
     if ("de.objectcode.time4u.client.ui.workitem.new".equals(id)) {
       if (selectedDay != null) {
         final WorkItemDialog dialog = new WorkItemDialog(m_view.getSite(), RepositoryFactory.getRepository(),
@@ -105,19 +112,18 @@ public class WorkItemActionDelegate implements IWorkbenchWindowActionDelegate, I
         }
       }
     } else if ("de.objectcode.time4u.client.ui.workitem.delete".equals(id)) {
-      if (selectedWorkItem != null) {
-        final IPreferenceStore store = UIPlugin.getDefault().getPreferenceStore();
+      if (selectedWorkItems != null) {
 
-        if (store.getBoolean(PreferenceConstants.UI_CONFIRM_WORKITEM_DELETE)
-            && !MessageDialog.openQuestion(m_view.getSite().getShell(), "WorkItem delete", "Delete WorkItem "
-                + DateFormat.format(selectedWorkItem.getDay()) + " " + TimeFormat.format(selectedWorkItem.getBegin())
-                + " - " + TimeFormat.format(selectedWorkItem.getEnd()) + " '" + selectedWorkItem.getComment() + "'")) {
-          return;
-        }
-        try {
-          RepositoryFactory.getRepository().getWorkItemRepository().deleteWorkItem(selectedWorkItem, true);
-        } catch (final Exception e) {
-          UIPlugin.getDefault().log(e);
+        final WorkItemDeleteDialog deleteDialog = new WorkItemDeleteDialog(m_view.getSite(), selectedWorkItems);
+
+        if(deleteDialog.open() == WorkItemDeleteDialog.OK){
+          try {
+            for(Object obj : selectedWorkItems){
+              RepositoryFactory.getRepository().getWorkItemRepository().deleteWorkItem((WorkItem)obj, true);
+            }
+          } catch (final Exception e) {
+            UIPlugin.getDefault().log(e);
+          }
         }
       }
     } else if ("de.objectcode.time4u.client.ui.workitem.continue".equals(id)) {
@@ -158,19 +164,24 @@ public class WorkItemActionDelegate implements IWorkbenchWindowActionDelegate, I
       //
       //      dialog.open();
     } else if("de.objectcode.time4u.client.ui.workitem.copy".equals(id)){
-      final WorkitemCopyDialog workitemCopyDialog = new WorkitemCopyDialog(m_view.getSite(), selectedWorkItem);
-      
-      if(workitemCopyDialog.open() == WorkitemCopyDialog.OK){
-        final WorkItem copiedWorkIem = workitemCopyDialog.getCopiedWorkitem();
-        
-        if(selectedWorkItem.getDay().equals(copiedWorkIem.getDay())){
-          return;
+      if(selectedWorkItems != null && !selectedWorkItems.isEmpty()){
+        final WorkitemCopyDialog workitemCopyDialog = new WorkitemCopyDialog(m_view.getSite(), selectedWorkItems);
+
+        if(workitemCopyDialog.open() == WorkitemCopyDialog.OK){
+
+          final List<WorkItem> copiedWorkIems = workitemCopyDialog.getCopiedWorkitem();
+
+          if(selectedWorkItem.getDay().equals(copiedWorkIems.get(0).getDay())){
+            return;
+          }
+          try {
+            for(WorkItem workitem : copiedWorkIems){
+              RepositoryFactory.getRepository().getWorkItemRepository().storeWorkItem(workitem, true);
+            }
+          } catch (RepositoryException e) {
+            UIPlugin.getDefault().log(e);        }
+
         }
-        try {
-          RepositoryFactory.getRepository().getWorkItemRepository().storeWorkItem(copiedWorkIem, true);
-        } catch (RepositoryException e) {
-         UIPlugin.getDefault().log(e);        }
-        
       }
     }
   }

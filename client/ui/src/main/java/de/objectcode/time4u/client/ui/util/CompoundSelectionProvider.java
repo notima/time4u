@@ -187,7 +187,7 @@ public class CompoundSelectionProvider implements IPostSelectionProvider, ISelec
         final ISelection selection = event.getSelection();
 
         if (selection instanceof IStructuredSelection) {
-          m_selection.setSelection(type, ((IStructuredSelection) selection).getFirstElement());
+          m_selection.setSelection(type, ((IStructuredSelection) selection));
 
           fireSelectionChanged();
         }
@@ -211,7 +211,8 @@ public class CompoundSelectionProvider implements IPostSelectionProvider, ISelec
         final ISelection selection = event.getSelection();
 
         if (selection instanceof IStructuredSelection) {
-          m_selection.setSelection(type, ((IStructuredSelection) selection).getFirstElement());
+          
+          m_selection.setSelection(type, ((IStructuredSelection) selection));
 
           fireSelectionChanged();
         }
@@ -223,7 +224,7 @@ public class CompoundSelectionProvider implements IPostSelectionProvider, ISelec
         final ISelection selection = event.getSelection();
 
         if (selection instanceof IStructuredSelection) {
-          m_selection.setSelection(type, ((IStructuredSelection) selection).getFirstElement());
+          m_selection.setSelection(type, ((IStructuredSelection) selection));
 
           firePostSelectionChanged();
         }

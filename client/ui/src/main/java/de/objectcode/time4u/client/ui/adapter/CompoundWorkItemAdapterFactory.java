@@ -1,5 +1,7 @@
 package de.objectcode.time4u.client.ui.adapter;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdapterFactory;
 
 import de.objectcode.time4u.client.ui.util.CompoundSelection;
@@ -16,15 +18,16 @@ public class CompoundWorkItemAdapterFactory implements IAdapterFactory
     }
 
     final CompoundSelection selection = (CompoundSelection) adaptableObject;
+    final List<Object> selections = (List<Object>)selection.getSelection(CompoundSelectionEntityType.WORKITEM);
+    if(selections != null && !selections.isEmpty()){
+      if (WorkItem.class.isAssignableFrom(adapterType)) {
+        final Object sel = selections.get(0);
 
-    if (WorkItem.class.isAssignableFrom(adapterType)) {
-      final Object sel = selection.getSelection(CompoundSelectionEntityType.WORKITEM);
-
-      if (sel instanceof WorkItem) {
-        return sel;
+        if (sel instanceof WorkItem) {
+          return sel;
+        }
       }
     }
-
     return null;
   }
 
