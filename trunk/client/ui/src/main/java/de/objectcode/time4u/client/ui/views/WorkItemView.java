@@ -157,7 +157,7 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
 
     m_tableViewer.setCellModifier(new WorkItemTableCellModifier());
     m_tableViewer.addDropSupport(DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT, new Transfer[] {
-      TaskTransfer.getInstance()
+        TaskTransfer.getInstance()
     }, new DropTargetAdapter() {
       @Override
       public void drop(final DropTargetEvent event)
@@ -168,7 +168,7 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
         doDropTask((TaskTransfer.ProjectTask) event.data);
       }
     });
-    m_tableViewer.addDragSupport(DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT, new Transfer[] {
+    m_tableViewer.addDragSupport(DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT , new Transfer[] {
         TextTransfer.getInstance(), WorkItemTransfer.getInstance()
     }, new DragSourceAdapter() {
       @Override
@@ -176,34 +176,36 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
       {
         try {
           final IStructuredSelection selection = (IStructuredSelection) m_tableViewer.getSelection();
-          final WorkItem workItem = (WorkItem) selection.getFirstElement();
+          final List<WorkItem> workItems =  (List<WorkItem>)selection.toList();
 
           if (WorkItemTransfer.getInstance().isSupportedType(event.dataType)) {
-            event.data = workItem;
+            event.data = workItems;
           } else {
             final StringBuffer buffer = new StringBuffer();
-            buffer.append(DateFormat.format(m_currentDay));
-            buffer.append('\t');
-            buffer.append(TimeFormat.format(workItem.getBegin()));
-            buffer.append('\t');
-            buffer.append(TimeFormat.format(workItem.getEnd()));
-            buffer.append('\t');
-            final List<ProjectSummary> projectPath = RepositoryFactory.getRepository().getProjectRepository()
-                .getProjectPath(workItem.getProjectId());
-            final Iterator<ProjectSummary> it = projectPath.iterator();
-            while (it.hasNext()) {
-              buffer.append(it.next().getName());
-              if (it.hasNext()) {
-                buffer.append('.');
+            for(WorkItem workItem : workItems){
+              buffer.append(DateFormat.format(m_currentDay));
+              buffer.append('\t');
+              buffer.append(TimeFormat.format(workItem.getBegin()));
+              buffer.append('\t');
+              buffer.append(TimeFormat.format(workItem.getEnd()));
+              buffer.append('\t');
+              final List<ProjectSummary> projectPath = RepositoryFactory.getRepository().getProjectRepository()
+              .getProjectPath(workItem.getProjectId());
+              final Iterator<ProjectSummary> it = projectPath.iterator();
+              while (it.hasNext()) {
+                buffer.append(it.next().getName());
+                if (it.hasNext()) {
+                  buffer.append('.');
+                }
               }
+              buffer.append('\t');
+              final TaskSummary task = RepositoryFactory.getRepository().getTaskRepository().getTaskSummary(
+                  workItem.getTaskId());
+              buffer.append(task.getName());
+              buffer.append('\t');
+              buffer.append(workItem.getComment());
+              buffer.append('\n');
             }
-            buffer.append('\t');
-            final TaskSummary task = RepositoryFactory.getRepository().getTaskRepository().getTaskSummary(
-                workItem.getTaskId());
-            buffer.append(task.getName());
-            buffer.append('\t');
-            buffer.append(workItem.getComment());
-
             event.data = buffer.toString();
           }
         } catch (final Exception e) {
@@ -216,7 +218,7 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
       {
         try {
           final IHandlerService handlerService = (IHandlerService) getSite().getWorkbenchWindow().getWorkbench()
-              .getService(IHandlerService.class);
+          .getService(IHandlerService.class);
 
           handlerService.executeCommand(ICommandIds.CMD_WORKITEM_EDIT, null);
         } catch (final NotEnabledException e) {
@@ -445,7 +447,7 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
           out.print(TimeFormat.format(workItem.getEnd()));
           out.print('\t');
           final List<ProjectSummary> projectPath = RepositoryFactory.getRepository().getProjectRepository()
-              .getProjectPath(workItem.getProjectId());
+          .getProjectPath(workItem.getProjectId());
           final Iterator<ProjectSummary> it = projectPath.iterator();
           while (it.hasNext()) {
             out.print(it.next().getName());
@@ -466,9 +468,9 @@ public class WorkItemView extends ViewPart implements IRepositoryListener, ISele
         out.close();
 
         m_clipboard.setContents(new Object[] {
-          writer.toString()
+            writer.toString()
         }, new Transfer[] {
-          TextTransfer.getInstance()
+            TextTransfer.getInstance()
         });
       }
     } catch (final Exception e) {

@@ -1,5 +1,7 @@
 package de.objectcode.time4u.client.ui.views;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.MenuManager;
@@ -14,6 +16,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceAdapter;
 import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -29,6 +33,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 import de.objectcode.time4u.client.store.api.ITaskRepository;
+import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.store.api.event.IRepositoryListener;
 import de.objectcode.time4u.client.store.api.event.RepositoryEvent;
@@ -36,6 +41,7 @@ import de.objectcode.time4u.client.store.api.event.RepositoryEventType;
 import de.objectcode.time4u.client.ui.ICommandIds;
 import de.objectcode.time4u.client.ui.UIPlugin;
 import de.objectcode.time4u.client.ui.dnd.TaskTransfer;
+import de.objectcode.time4u.client.ui.dnd.WorkItemTransfer;
 import de.objectcode.time4u.client.ui.provider.TaskContentProvider;
 import de.objectcode.time4u.client.ui.provider.TaskLabelProvider;
 import de.objectcode.time4u.client.ui.util.CompoundSelectionEntityType;
@@ -75,7 +81,7 @@ public class TaskListView extends ViewPart implements IRepositoryListener, ISele
     m_viewer.setLabelProvider(new TaskLabelProvider());
     m_viewer.setInput(null);
     m_viewer.addDragSupport(DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT, new Transfer[] {
-      TaskTransfer.getInstance()
+        TaskTransfer.getInstance()
     }, new DragSourceAdapter() {
       @Override
       public void dragSetData(final DragSourceEvent event)
@@ -84,6 +90,39 @@ public class TaskListView extends ViewPart implements IRepositoryListener, ISele
         final TaskTransfer.ProjectTask projectTask = new TaskTransfer.ProjectTask(m_selectedProject,
             (TaskSummary) selection.getFirstElement());
         event.data = projectTask;
+      }
+    });
+
+    m_viewer.addDropSupport(DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT, new Transfer[] {
+        WorkItemTransfer.getInstance()
+    }, new DropTargetAdapter(){
+      @Override
+      public void drop(final DropTargetEvent event)
+      {
+        if (event.data == null ) {
+          return;
+        }
+        TaskSummary taskSummary = null;
+        if (event.item != null && event.item.getData() != null && event.item.getData() instanceof TaskSummary) {
+          taskSummary = (TaskSummary) event.item.getData();
+        }
+
+        List<WorkItem> workitems = null;
+        if(event.data instanceof List){
+          workitems = (List<WorkItem>)event.data;
+        }
+        if(workitems != null && !workitems.isEmpty()){
+          try {
+            for(WorkItem workItem : workitems){
+              workItem.setTaskId(taskSummary.getId());
+              workItem.setProjectId(taskSummary.getProjectId());
+
+              RepositoryFactory.getRepository().getWorkItemRepository().storeWorkItem(workItem, true);
+            }
+          } catch (RepositoryException e) {
+            UIPlugin.getDefault().log(e);
+          }
+        }
       }
     });
 
@@ -111,7 +150,7 @@ public class TaskListView extends ViewPart implements IRepositoryListener, ISele
       {
         try {
           final IHandlerService handlerService = (IHandlerService) getSite().getWorkbenchWindow().getWorkbench()
-              .getService(IHandlerService.class);
+          .getService(IHandlerService.class);
 
           handlerService.executeCommand(ICommandIds.CMD_TASK_EDIT, null);
         } catch (final Exception e) {

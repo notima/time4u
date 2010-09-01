@@ -66,7 +66,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
   /**
    * This is a callback that will allow us to create the viewer and initialize it.
    */
-  @Override
+  @Override @SuppressWarnings("unchecked")
   public void createPartControl(final Composite parent)
   {
     m_selectionProvider = new CompoundSelectionProvider();
@@ -85,8 +85,8 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
           return;
         }
 
-        if (event.data instanceof WorkItem) {
-          doDropWorkItem((WorkItem) event.data, ((DayControl) ((DropTarget) event.widget).getControl()).getDate(),
+        if (event.data instanceof List) {
+          doDropWorkItem((List<WorkItem>) event.data, ((DayControl) ((DropTarget) event.widget).getControl()).getDate(),
               (event.detail & DND.DROP_COPY) != 0);
         } else if (event.data instanceof TaskTransfer.ProjectTask) {
           doDropTask((TaskTransfer.ProjectTask) event.data, ((DayControl) ((DropTarget) event.widget).getControl())
@@ -142,7 +142,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
         menuMgr.add(new Separator());
         menuMgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         final CalendarDay selection = ((List<CalendarDay>)m_selectionProvider
-        .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
+            .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
         Assert.isNotNull(selection);
 
         try {
@@ -260,17 +260,19 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     }
   }
 
-  private void doDropWorkItem(final WorkItem workItem, final Date date, final boolean copy)
+  private void doDropWorkItem(final List<WorkItem> workItems, final Date date, final boolean copy)
   {
     try {
-      if (!copy) {
-        RepositoryFactory.getRepository().getWorkItemRepository().deleteWorkItem(workItem, true);
+      for(WorkItem workItem : workItems){
+        if (!copy) {
+          RepositoryFactory.getRepository().getWorkItemRepository().deleteWorkItem(workItem, true);
+        }
+
+        workItem.setId(null);
+        workItem.setDay(new CalendarDay(date));
+
+        RepositoryFactory.getRepository().getWorkItemRepository().storeWorkItem(workItem, true);
       }
-
-      workItem.setId(null);
-      workItem.setDay(new CalendarDay(date));
-
-      RepositoryFactory.getRepository().getWorkItemRepository().storeWorkItem(workItem, true);
     } catch (final Exception e) {
       UIPlugin.getDefault().log(e);
     }
@@ -327,7 +329,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
     SetDayTagAction(final CalendarDay currentDay, final int regularTime, final Set<String> currentTags,
         final DayTag dayTag)
-    {
+        {
       super(dayTag.getName(), Action.AS_CHECK_BOX);
 
       setText(dayTag.getLabel());
@@ -343,7 +345,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
         setEnabled(currentTags.contains(dayTag.getName()) || dayTag.getRegularTime() == null
             || dayTag.getRegularTime() == regularTime);
       }
-    }
+        }
 
     @Override
     public void run()
