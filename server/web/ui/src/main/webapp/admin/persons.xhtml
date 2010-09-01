@@ -134,7 +134,7 @@
 						</rich:tab>
 					</rich:tabPanel>
 					<a4j:commandButton
-						action="#{admin.personListController.confirmDeletePerson}" value="Delete Person" rendered="#{admin.accountListController.selectedAccount.userId != 'admin'}"/>
+						action="#{admin.personListController.confirmDeletePerson}" value="Delete Person" rendered="#{admin.accountListController.selectedAccount.account.userId != 'admin'}"/>
 				</h:panelGroup>
 			</h:panelGroup>
 		</h:form>
