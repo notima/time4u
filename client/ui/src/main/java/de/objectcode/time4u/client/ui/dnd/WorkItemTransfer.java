@@ -1,5 +1,8 @@
 package de.objectcode.time4u.client.ui.dnd;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
 
@@ -26,7 +29,7 @@ public class WorkItemTransfer extends ByteArrayTransfer
   protected int[] getTypeIds()
   {
     return new int[] {
-      TYPEID
+        TYPEID
     };
   }
 
@@ -34,7 +37,7 @@ public class WorkItemTransfer extends ByteArrayTransfer
   protected String[] getTypeNames()
   {
     return new String[] {
-      TYPE_NAME
+        TYPE_NAME
     };
   }
 
@@ -42,8 +45,12 @@ public class WorkItemTransfer extends ByteArrayTransfer
   protected void javaToNative(final Object object, final TransferData transferData)
   {
     try {
-      final byte[] bytes = ((WorkItem) object).getId().getBytes("UTF-8");
-
+      List<WorkItem> workItems = (List<WorkItem>)object;
+      String temp = "";
+      for(WorkItem workItem : workItems){
+        temp += workItem.getId()+",";
+      }
+      final byte[] bytes = temp.getBytes("UTF-8");
       if (bytes != null) {
         super.javaToNative(bytes, transferData);
       }
@@ -59,12 +66,18 @@ public class WorkItemTransfer extends ByteArrayTransfer
     return fromByteArray(bytes);
   }
 
-  protected WorkItem fromByteArray(final byte[] bytes)
+  protected List<WorkItem> fromByteArray(final byte[] bytes)
   {
+    List<WorkItem> workItems = new ArrayList<WorkItem>();
     try {
-      final String workItemId = new String(bytes, "UTF-8");
+      WorkItem workitem = null;
+      String[] workItemIds = new String(bytes, "UTF-8").split(",");
+      for(String workItemId : workItemIds){
+        workitem = RepositoryFactory.getRepository().getWorkItemRepository().getWorkItem(workItemId);
+        workItems.add(workitem);
+      }
 
-      return RepositoryFactory.getRepository().getWorkItemRepository().getWorkItem(workItemId);
+      return workItems;
     } catch (final Exception e) {
       return null;
     }
