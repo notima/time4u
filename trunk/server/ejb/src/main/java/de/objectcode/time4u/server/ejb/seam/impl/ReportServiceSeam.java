@@ -236,7 +236,7 @@ public class ReportServiceSeam implements IReportServiceLocal
     newQueryString.append("WHERE ");
     newQueryString.append("     wi.dayInfo.date >= :from AND ");
     newQueryString.append("     wi.dayInfo.date < :until AND ");
-    newQueryString.append(" (owner.id = :userId OR wi.dayInfo.person.id = :userId) ");
+    newQueryString.append(" (owner.id = :userId )"); 
     newQueryString.append("GROUP BY ");
     newQueryString.append("     wi.dayInfo.person, ");
     newQueryString.append("     wi.project");
