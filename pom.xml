@@ -67,19 +67,22 @@
 		<repository>
 			<id>codehaus-releases</id>
 			<name>codehaus-releases</name>
-			<url>http://repository.codehaus.org</url>
+			<url>https://nexus.codehaus.org/content/groups/public</url>
+			<!--url>http://repository.codehaus.org</url-->			
 		</repository>
 		<repository>
 			<id>codehaus-snapshots</id>
 			<name>codehaus-snapshots</name>
-			<url>http://snapshots.repository.codehaus.org</url>
+			<!--url>http://snapshots.repository.codehaus.org</url-->
+			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>			
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>codehaus-snapshots</id>
 			<name>codehaus-snapshots</name>
-			<url>http://snapshots.repository.codehaus.org</url>
+			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
+			<!--url>http://snapshots.repository.codehaus.org</url-->			
 		</pluginRepository>
 	</pluginRepositories>
 	<properties>
