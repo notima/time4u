@@ -75,9 +75,9 @@ public class ReportServiceSeam implements IReportServiceLocal
     IRowDataIterator<?> rowDataIterator = null;
     switch (reportDefinition.getEntityType()) {
       case WORKITEM:
-        queryStr.append("from ");
+        queryStr.append("select distinct w from ");
         queryStr.append(WorkItemEntity.class.getName());
-        queryStr.append(" w join fetch w.dayInfo where w.dayInfo.person.id in (:allowedPersons)");
+        queryStr.append(" w join fetch w.dayInfo left outer join w.dayInfo.tags tag left outer join w.dayInfo.person.memberOf team where w.dayInfo.person.id in (:allowedPersons)");
         orderStr = " order by w.dayInfo.date asc, w.begin asc";
         rowDataIterator = new WorkItemRowDataIterator();
         break;
@@ -85,7 +85,7 @@ public class ReportServiceSeam implements IReportServiceLocal
         queryStr.append("select distinct d from ");
         queryStr.append(DayInfoEntity.class.getName());
         queryStr
-        .append(" d left outer join fetch d.tags left outer join fetch d.workItems join fetch d.person where d.person.id in (:allowedPersons)");
+        .append(" d left outer join fetch d.tags left outer join fetch d.workItems join fetch d.person left outer join fetch d.person.responsibleFor team where d.person.id in (:allowedPersons)");
         orderStr = " order by d.date asc";
         if (reportDefinition.isFill()) {
           rowDataIterator = new DayInfoRowDataIteratorWithFill();
@@ -140,7 +140,7 @@ public class ReportServiceSeam implements IReportServiceLocal
 
     return dataCollector.getReportResult();
   }
-
+ @SuppressWarnings("unchecked")
   private List<String> getAllChildProjectIds(String id) {
 
     List<String> childIds = new ArrayList<String>();

@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlType;
 import de.objectcode.time4u.server.api.data.EntityType;
 import de.objectcode.time4u.server.ejb.seam.api.filter.AndFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.DateRangeFilter;
+import de.objectcode.time4u.server.ejb.seam.api.filter.DayTagFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.IFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.OrFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.ParameterRef;
@@ -22,6 +23,7 @@ import de.objectcode.time4u.server.ejb.seam.api.filter.PersonFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.ProjectFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.ProjectPathFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.TaskFilter;
+import de.objectcode.time4u.server.ejb.seam.api.filter.TeamFilter;
 import de.objectcode.time4u.server.ejb.seam.api.filter.TodoStateFilter;
 
 /**
@@ -87,7 +89,8 @@ public abstract class BaseReportDefinition implements Serializable
       @XmlElementRef(type = DateRangeFilter.class), @XmlElementRef(type = ParameterRef.class),
       @XmlElementRef(type = PersonFilter.class), @XmlElementRef(type = TodoStateFilter.class),
       @XmlElementRef(type = TaskFilter.class), @XmlElementRef(type = ProjectFilter.class),
-      @XmlElementRef(type = ProjectPathFilter.class) })
+      @XmlElementRef(type = ProjectPathFilter.class),@XmlElementRef(type = DayTagFilter.class),
+      @XmlElementRef(type = TeamFilter.class)})
   public IFilter getFilter()
   {
     return m_filter;

@@ -8,9 +8,11 @@ import javax.xml.bind.annotation.XmlType;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.BaseParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.DateRangeParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.DayParameterValue;
+import de.objectcode.time4u.server.ejb.seam.api.report.parameter.DayTagParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.MonthParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.PersonParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.ProjectParameterValue;
+import de.objectcode.time4u.server.ejb.seam.api.report.parameter.TeamParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.TodoStateParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.WeekParameterValue;
 
@@ -21,11 +23,13 @@ public enum ReportParameterType
   MONTH("month", MonthParameterValue.class),
   WEEK("week", WeekParameterValue.class),
   DAY("day", DayParameterValue.class),
+  DAYTAG("daytag", DayTagParameterValue.class),
   DATE_RANGE("daterange", DateRangeParameterValue.class),
   PERSON("person", PersonParameterValue.class),
   PROJECT("project", ProjectParameterValue.class),
-  TODO_STATE("todostate", TodoStateParameterValue.class);
-
+  TODO_STATE("todostate", TodoStateParameterValue.class),
+  TEAM("team", TeamParameterValue.class);
+  
   private final String m_id;
   private final Class<? extends BaseParameterValue> m_valueClass;
   private final Constructor<? extends BaseParameterValue> m_valueConstructor;
