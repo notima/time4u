@@ -85,7 +85,7 @@ public class ReportServiceSeam implements IReportServiceLocal
         queryStr.append("select distinct d from ");
         queryStr.append(DayInfoEntity.class.getName());
         queryStr
-        .append(" d left outer join fetch d.tags left outer join fetch d.workItems join fetch d.person left outer join fetch d.person.responsibleFor team where d.person.id in (:allowedPersons)");
+        .append(" d left outer join fetch d.tags left outer join fetch d.workItems join fetch d.person left outer join fetch d.person.memberOf team where d.person.id in (:allowedPersons)");
         orderStr = " order by d.date asc";
         if (reportDefinition.isFill()) {
           rowDataIterator = new DayInfoRowDataIteratorWithFill();
