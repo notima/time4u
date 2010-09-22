@@ -20,7 +20,9 @@ import org.jboss.seam.annotations.security.Restrict;
 import de.objectcode.time4u.server.api.data.EntityType;
 import de.objectcode.time4u.server.ejb.seam.api.ITeamServiceLocal;
 import de.objectcode.time4u.server.entities.PersonEntity;
+import de.objectcode.time4u.server.entities.ProjectEntity;
 import de.objectcode.time4u.server.entities.TeamEntity;
+import de.objectcode.time4u.server.entities.account.UserAccountEntity;
 import de.objectcode.time4u.server.entities.revision.ILocalIdGenerator;
 import de.objectcode.time4u.server.entities.revision.IRevisionGenerator;
 import de.objectcode.time4u.server.entities.revision.IRevisionLock;
@@ -81,4 +83,20 @@ public class TeamServiceSeam implements ITeamServiceLocal
     initTeams();
   }
 
+  @SuppressWarnings("unchecked")
+  @Restrict("#{s:hasRole('user')}")
+  public List<TeamEntity> getTeamsByPersonId(final String identity){
+    
+    final UserAccountEntity userAccount = m_manager.find(UserAccountEntity.class, identity);
+    final StringBuffer queryString = new StringBuffer(" select t" + 
+      " from " + TeamEntity.class.getName()
+      + " t left outer join t.owners to"
+        + " where to.id in ( :personId )");
+    
+    final Query query = m_manager.createQuery(queryString.toString());
+    
+    query.setParameter("personId", userAccount.getPerson().getId());
+    
+    return query.getResultList();
+  }
 }

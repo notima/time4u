@@ -41,7 +41,8 @@ public class AndFilter implements IFilter
 
   @XmlElementRefs( { @XmlElementRef(type = AndFilter.class), @XmlElementRef(type = OrFilter.class),
       @XmlElementRef(type = DateRangeFilter.class), @XmlElementRef(type = ParameterRef.class),
-      @XmlElementRef(type = PersonFilter.class), @XmlElementRef(type = DayTagFilter.class) })
+      @XmlElementRef(type = PersonFilter.class), @XmlElementRef(type = DayTagFilter.class),
+      @XmlElementRef(type = TeamFilter.class) })
   public List<IFilter> getFilters()
   {
     return m_filters;
