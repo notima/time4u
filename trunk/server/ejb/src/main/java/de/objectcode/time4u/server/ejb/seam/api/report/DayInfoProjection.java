@@ -1,6 +1,9 @@
 package de.objectcode.time4u.server.ejb.seam.api.report;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +82,18 @@ public enum DayInfoProjection implements IProjection
       return new SumAggregation();
     }
   },
+  MONTH(ColumnType.NAME, "Month")
+  {
+    @Override
+    public Object project(IRowDataAdapter rowData)
+    {
+      SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMMM");
+      Date date = rowData.getDayInfo().getDate();
+
+      String month = dateFormatter.format(date);
+      return month;
+    }
+  },
   TAGS(ColumnType.NAME_ARRAY, "Tags") {
     public Object project(final IRowDataAdapter rowData)
     {
@@ -88,6 +103,11 @@ public enum DayInfoProjection implements IProjection
         tags.add(dayTag.getName());
       }
       return tags;
+    }
+    @Override
+    public IAggregation createAggregation()
+    {
+      return new ListAggregation();
     }
   };
 
