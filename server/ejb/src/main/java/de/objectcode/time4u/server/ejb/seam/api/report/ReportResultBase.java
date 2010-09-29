@@ -1,9 +1,14 @@
 package de.objectcode.time4u.server.ejb.seam.api.report;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import de.objectcode.time4u.server.ejb.seam.api.report.comparator.MonthComparator;
 
 /**
  * Base class of a report result.
@@ -25,6 +30,8 @@ public class ReportResultBase
   protected Object[] m_aggregates;
   /** Map of group-by sub-reports. */
   protected Map<Object, ReportResultGroup> m_groups;
+  /** Comparators to sort the mao */
+  protected Map<Object,Comparator> m_comparators;
 
   protected ReportResultBase(final List<ColumnDefinition> columns, final List<ColumnDefinition> groupByColumns)
   {
@@ -32,8 +39,13 @@ public class ReportResultBase
     m_groupByColumns = groupByColumns;
     m_rows = new ArrayList<ReportRow>();
     m_groups = new TreeMap<Object, ReportResultGroup>();
+    registerComparators();
   }
 
+  private void registerComparators(){
+    m_comparators = new HashMap<Object,Comparator>();
+    m_comparators.put("Month", new MonthComparator());
+  }
   public void addColumn(final ColumnType columnType, final String header)
   {
     m_columns.add(new ColumnDefinition(columnType, header, m_columns.size()));
@@ -101,7 +113,18 @@ public class ReportResultBase
 
   public List<ReportResultGroup> getGroups()
   {
-    return new ArrayList<ReportResultGroup>(m_groups.values());
+    Map<Object, ReportResultGroup> sortedMap = null;
+    Comparator comparator = null;
+    
+    if(m_groupByColumns != null && !m_groupByColumns.isEmpty()){
+      String grouping = m_groupByColumns.get(0).getHeader();
+      comparator = m_comparators.get(grouping);
+    }
+
+    sortedMap = new TreeMap<Object, ReportResultGroup>(comparator);
+    sortedMap.putAll(m_groups);
+
+    return new ArrayList<ReportResultGroup>(sortedMap.values());
   }
 
   public void addRow(final List<ValueLabelPair> groups, final Object[] row)

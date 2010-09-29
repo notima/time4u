@@ -15,11 +15,13 @@ import de.objectcode.time4u.server.ejb.seam.api.report.parameter.ProjectParamete
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.TeamParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.TodoStateParameterValue;
 import de.objectcode.time4u.server.ejb.seam.api.report.parameter.WeekParameterValue;
+import de.objectcode.time4u.server.ejb.seam.api.report.parameter.YearParameterValue;
 
 @XmlEnum
 @XmlType(name = "parameter-type")
 public enum ReportParameterType
 {
+  YEAR("year", YearParameterValue.class),
   MONTH("month", MonthParameterValue.class),
   WEEK("week", WeekParameterValue.class),
   DAY("day", DayParameterValue.class),

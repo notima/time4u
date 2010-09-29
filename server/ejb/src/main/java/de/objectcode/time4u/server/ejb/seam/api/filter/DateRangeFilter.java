@@ -145,4 +145,16 @@ public class DateRangeFilter implements IFilter
 
     return new DateRangeFilter(from, until);
   }
+  
+  public static DateRangeFilter filterYear(final int year)
+  {
+    final Calendar calendar = Calendar.getInstance();
+    
+    calendar.set(year, 0, 1, 0, 0, 0);
+    final Date from = new Date(calendar.getTimeInMillis());
+    calendar.set(year, 11, 31, 0, 0, 0);
+    final Date until = new Date(calendar.getTimeInMillis());
+    
+    return new DateRangeFilter(from, until);
+  }
 }

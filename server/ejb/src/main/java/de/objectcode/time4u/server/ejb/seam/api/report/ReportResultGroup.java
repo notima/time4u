@@ -32,4 +32,5 @@ public class ReportResultGroup extends ReportResultBase
   {
     return m_label;
   }
+
 }
