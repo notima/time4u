@@ -222,6 +222,15 @@ public class ReportServiceSeam implements IReportServiceLocal
     // We use them to force Hibernate to use inner joins instead of
     // the from a,b-notation because of a bug in hibernate 3.2.4. hibernate
     // does not calculate the right join order when mixing "," and "join"
+    final Set<String> allowedPersonIds = new HashSet<String>();
+
+    allowedPersonIds.add(userAccount.getPerson().getId());
+    for (final TeamEntity team : userAccount.getPerson().getResponsibleFor()) {
+      for (final PersonEntity member : team.getMembers()) {
+        allowedPersonIds.add(member.getId());
+      }
+    }
+    
     newQueryString.append("SELECT ");
     newQueryString.append("     wi.dayInfo.person, ");
     newQueryString.append("     wi.project, ");
@@ -229,20 +238,18 @@ public class ReportServiceSeam implements IReportServiceLocal
     newQueryString.append("FROM ");
     newQueryString.append(WorkItemEntity.class.getName()).append(" wi ");
     newQueryString.append(" INNER JOIN wi.dayInfo AS di");
-    newQueryString.append(" INNER JOIN di.person ");
+    newQueryString.append(" INNER JOIN di.person person");
     newQueryString.append(" INNER JOIN wi.project ");
-    newQueryString.append(" INNER JOIN wi.dayInfo.person.memberOf team ");
-    newQueryString.append(" INNER JOIN team.owners owner ");
-    newQueryString.append("WHERE ");
+    newQueryString.append(" WHERE ");
     newQueryString.append("     wi.dayInfo.date >= :from AND ");
     newQueryString.append("     wi.dayInfo.date < :until AND ");
-    newQueryString.append(" (owner.id = :userId )"); 
+    newQueryString.append(" (person.id in (:allowedPersons) )");    
     newQueryString.append("GROUP BY ");
     newQueryString.append("     wi.dayInfo.person, ");
     newQueryString.append("     wi.project");
 
     final Query query = m_manager.createQuery(newQueryString.toString());
-    query.setParameter("userId", userAccount.getPerson().getId());
+    query.setParameter("allowedPersons", allowedPersonIds);
     query.setParameter("from", from);
     query.setParameter("until", until);
 
@@ -266,7 +273,6 @@ public class ReportServiceSeam implements IReportServiceLocal
     }
     dataCollector.finish();
     m_manager.clear();
-
     return dataCollector.getCrossTable();
   }
 
