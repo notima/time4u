@@ -9,8 +9,15 @@ Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.equinox.launcher.gtk.linux.x86_64;sin
  gleton:=true
 Eclipse-BundleShape: dir
-Bundle-Version: 1.1.0.v20091012
+Eclipse-SourceReferences: scm:cvs:pserver:dev.eclipse.org:/cvsroot/rt:
+ org.eclipse.equinox/framework/bundles/org.eclipse.equinox.launcher/fr
+ agments/org.eclipse.equinox.launcher.gtk.linux.x86_64;tag=R36x_v20101
+ 019_1345
+Bundle-Version: 1.1.2.R36x_v20101019_1345
 Bundle-ManifestVersion: 2
+
+Name: eclipse_1310.so
+SHA1-Digest: In+KadxDq1Ui64Lpq8qA3tJNBZ4=
 
 Name: launcher.gtk.linux.x86_64.properties
 SHA1-Digest: BpMSKaJwfrS+AcFOYHzZL1KFjrk=
@@ -20,7 +27,4 @@ SHA1-Digest: KyT9FF7C7t86NoBoa2kZT3ZJBfw=
 
 Name: about.html
 SHA1-Digest: a9lDHrGuLPkvHBUhsqWU+V2mhPw=
-
-Name: eclipse_1302.so
-SHA1-Digest: 5RkAeAEQPdiLz0tBBY8wXPPE/Wk=
 

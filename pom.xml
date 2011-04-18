@@ -104,8 +104,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.5</source>
+					<target>1.5</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 				</configuration>
@@ -753,7 +753,7 @@
 					<bottom><![CDATA[ <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=239870&amp;type=2" alt="sourceforge.net"></a>]]></bottom>
 				</configuration>
 			</plugin>
-		</plugins>		
+		</plugins>				
 	</reporting>
 
 </project>

@@ -11,11 +11,11 @@ Name: eclipse_update_120.jpg
 SHA1-Digest: xstAqMgs/a5AsQXQZSdDQ79veOA=
 
 Name: license.html
-SHA1-Digest: YXfaVLayE8gaE0VWfKzUHsp6IyM=
+SHA1-Digest: fphtEeCfqpoKqwts62pNnuL86wM=
 
 Name: feature.properties
-SHA1-Digest: YEoJ+rkOBezUldp9Hv+ZHsWAvs4=
+SHA1-Digest: EiZw/VROpbNuz40atdDGg8bUdU0=
 
 Name: feature.xml
-SHA1-Digest: 3cy/wJdiapTCCtUOtK0mFg1DICs=
+SHA1-Digest: oPAReKxSqOvlhD/6NqcJk3Fjnz4=
 
