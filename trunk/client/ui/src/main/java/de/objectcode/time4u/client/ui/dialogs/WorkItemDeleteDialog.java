@@ -23,17 +23,17 @@ import de.objectcode.time4u.client.ui.provider.WorkItemCopyAndDeleteDialogTableL
 public class WorkItemDeleteDialog extends Dialog
 {
 
-  private List m_workitemsToDelete;
-  
-  public WorkItemDeleteDialog(IShellProvider parentShell, List workitemsToDelete)
+  private final List<?> m_workitemsToDelete;
+
+  public WorkItemDeleteDialog(final IShellProvider parentShell, final List<?> workitemsToDelete)
   {
     super(parentShell);
-    
+
     setShellStyle(SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | getDefaultOrientation());
-    
+
     m_workitemsToDelete = workitemsToDelete;
   }
-  
+
   @Override
   protected void configureShell(final Shell newShell)
   {
@@ -41,15 +41,15 @@ public class WorkItemDeleteDialog extends Dialog
 
     newShell.setText(UIPlugin.getDefault().getString("dialog.workitem.delete.title"));
   }
-  
+
   @Override
   protected Control createDialogArea(final Composite parent)
   {
     final Composite composite = (Composite) super.createDialogArea(parent);
     final Composite root = new Composite(composite, SWT.NONE);
     root.setLayout(new GridLayout(1, false));
-    
-    TableViewer tableViewer = new TableViewer(root, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
+
+    final TableViewer tableViewer = new TableViewer(root, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
 
     final TableLayout layout = new TableLayout();
     layout.addColumnData(new ColumnWeightData(10, 50, true));
@@ -63,7 +63,7 @@ public class WorkItemDeleteDialog extends Dialog
     tableViewer.getTable().setLinesVisible(true);
     tableViewer.getTable().setLayout(layout);
 
-    GridData gridData = new GridData(GridData.FILL_BOTH);
+    final GridData gridData = new GridData(GridData.FILL_BOTH);
     gridData.horizontalSpan = 4;
     gridData.widthHint = convertWidthInCharsToPixels(100);
     tableViewer.getTable().setLayoutData(gridData);
@@ -86,12 +86,12 @@ public class WorkItemDeleteDialog extends Dialog
     final TableColumn commentColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
     commentColumn.setText("Comment");
     commentColumn.setMoveable(false);
-    
+
     tableViewer.setContentProvider(new WorkItemCopyAndDeleteDialogTableContentProvider());
     tableViewer.setLabelProvider(new WorkItemCopyAndDeleteDialogTableLabelProvider(RepositoryFactory.getRepository()));
-    
+
     tableViewer.setInput(m_workitemsToDelete);
-    
+
     return composite;
   }
 

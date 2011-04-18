@@ -29,7 +29,7 @@ public class WorkItemTransfer extends ByteArrayTransfer
   protected int[] getTypeIds()
   {
     return new int[] {
-        TYPEID
+      TYPEID
     };
   }
 
@@ -37,7 +37,7 @@ public class WorkItemTransfer extends ByteArrayTransfer
   protected String[] getTypeNames()
   {
     return new String[] {
-        TYPE_NAME
+      TYPE_NAME
     };
   }
 
@@ -45,10 +45,11 @@ public class WorkItemTransfer extends ByteArrayTransfer
   protected void javaToNative(final Object object, final TransferData transferData)
   {
     try {
-      List<WorkItem> workItems = (List<WorkItem>)object;
+      @SuppressWarnings("unchecked")
+      final List<WorkItem> workItems = (List<WorkItem>) object;
       String temp = "";
-      for(WorkItem workItem : workItems){
-        temp += workItem.getId()+",";
+      for (final WorkItem workItem : workItems) {
+        temp += workItem.getId() + ",";
       }
       final byte[] bytes = temp.getBytes("UTF-8");
       if (bytes != null) {
@@ -68,11 +69,11 @@ public class WorkItemTransfer extends ByteArrayTransfer
 
   protected List<WorkItem> fromByteArray(final byte[] bytes)
   {
-    List<WorkItem> workItems = new ArrayList<WorkItem>();
+    final List<WorkItem> workItems = new ArrayList<WorkItem>();
     try {
       WorkItem workitem = null;
-      String[] workItemIds = new String(bytes, "UTF-8").split(",");
-      for(String workItemId : workItemIds){
+      final String[] workItemIds = new String(bytes, "UTF-8").split(",");
+      for (final String workItemId : workItemIds) {
         workitem = RepositoryFactory.getRepository().getWorkItemRepository().getWorkItem(workItemId);
         workItems.add(workitem);
       }

@@ -6,7 +6,7 @@
    <aboutInfo>
       <image path="product_lg.gif"/>
       <text>
-         Time4U client 1.0.0
+         Time4U client 1.0.2
       </text>
    </aboutInfo>
 
@@ -63,8 +63,8 @@
    </plugins>
 
    <features>
-      <feature id="de.objectcode.time4u.client.feature" version="1.0.1"/>
-      <feature id="org.eclipse.rcp" version="3.6.0.v20090924-9OAgFO0Ftsd5c2xeiwIpedV"/>
+      <feature id="de.objectcode.time4u.client.feature" version="1.0.2"/>
+      <feature id="org.eclipse.rcp" version="3.6.2.r362_v20101104-9SAxFMKFkSAqi8axkv1ZjegmiBLY"/>
    </features>
 
 

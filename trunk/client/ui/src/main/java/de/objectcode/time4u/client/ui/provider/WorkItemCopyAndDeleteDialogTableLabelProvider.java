@@ -1,7 +1,5 @@
 package de.objectcode.time4u.client.ui.provider;
 
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -9,20 +7,18 @@ import org.eclipse.swt.graphics.Image;
 import de.objectcode.time4u.client.store.api.IProjectRepository;
 import de.objectcode.time4u.client.store.api.IRepository;
 import de.objectcode.time4u.client.store.api.ITaskRepository;
-import de.objectcode.time4u.client.store.api.IWorkItemRepository;
 import de.objectcode.time4u.client.ui.UIPlugin;
-import de.objectcode.time4u.client.ui.util.DateFormat;
 import de.objectcode.time4u.client.ui.util.TimeFormat;
 import de.objectcode.time4u.server.api.data.ProjectSummary;
 import de.objectcode.time4u.server.api.data.TaskSummary;
 import de.objectcode.time4u.server.api.data.WorkItem;
 
-public class WorkItemCopyAndDeleteDialogTableLabelProvider  extends LabelProvider implements ITableLabelProvider
+public class WorkItemCopyAndDeleteDialogTableLabelProvider extends LabelProvider implements ITableLabelProvider
 {
 
   private final IProjectRepository m_projectRepository;
   private final ITaskRepository m_taskRepository;
-  
+
   public WorkItemCopyAndDeleteDialogTableLabelProvider(final IRepository repository)
   {
     super();
@@ -30,16 +26,14 @@ public class WorkItemCopyAndDeleteDialogTableLabelProvider  extends LabelProvide
     m_taskRepository = repository.getTaskRepository();
   }
 
-  @Override
   public Image getColumnImage(final Object element, final int columnIndex)
   {
     return null;
   }
 
-  @Override
-  public String getColumnText(final Object element, int columnIndex)
+  public String getColumnText(final Object element, final int columnIndex)
   {
-    
+
     if (element instanceof WorkItem) {
       final WorkItem workItem = (WorkItem) element;
 
@@ -74,7 +68,5 @@ public class WorkItemCopyAndDeleteDialogTableLabelProvider  extends LabelProvide
 
     return element.toString();
   }
-
-
 
 }
