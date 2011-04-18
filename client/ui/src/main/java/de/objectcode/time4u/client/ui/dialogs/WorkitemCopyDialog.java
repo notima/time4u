@@ -31,17 +31,16 @@ import de.objectcode.time4u.client.ui.controls.DateCombo;
 import de.objectcode.time4u.client.ui.provider.WorkItemCopyAndDeleteDialogTableContentProvider;
 import de.objectcode.time4u.client.ui.provider.WorkItemCopyAndDeleteDialogTableLabelProvider;
 import de.objectcode.time4u.server.api.data.CalendarDay;
-
 import de.objectcode.time4u.server.api.data.WorkItem;
 
 public class WorkitemCopyDialog extends Dialog
 {
 
-  private List m_workitemsToCopy;
-  private List<WorkItem> m_copiedWorkitems;
+  private final List<?> m_workitemsToCopy;
+  private final List<WorkItem> m_copiedWorkitems;
   private DateCombo m_toDateCombo;
 
-  public WorkitemCopyDialog(final IShellProvider shellProvider,final List workitemsToCopy)
+  public WorkitemCopyDialog(final IShellProvider shellProvider, final List<?> workitemsToCopy)
   {
     super(shellProvider);
 
@@ -50,9 +49,9 @@ public class WorkitemCopyDialog extends Dialog
     m_copiedWorkitems = new ArrayList<WorkItem>();
     m_workitemsToCopy = workitemsToCopy;
 
-    for(Object obj : workitemsToCopy){
-      WorkItem workItemToCopy = (WorkItem)obj; 
-      WorkItem copiedWorkitem = new WorkItem();
+    for (final Object obj : workitemsToCopy) {
+      final WorkItem workItemToCopy = (WorkItem) obj;
+      final WorkItem copiedWorkitem = new WorkItem();
 
       copiedWorkitem.setBegin(workItemToCopy.getBegin());
       copiedWorkitem.setEnd(workItemToCopy.getEnd());
@@ -63,20 +62,23 @@ public class WorkitemCopyDialog extends Dialog
       m_copiedWorkitems.add(copiedWorkitem);
     }
   }
+
   public List<WorkItem> getCopiedWorkitem()
   {
     return m_copiedWorkitems;
   }
-  @Override
-  protected Control createButtonBar(Composite parent)
-  {
-    Control buttonbar = super.createButtonBar(parent);
 
-    Button okButton = getButton(IDialogConstants.OK_ID);
-    okButton.setEnabled(!isSameDate()); 
+  @Override
+  protected Control createButtonBar(final Composite parent)
+  {
+    final Control buttonbar = super.createButtonBar(parent);
+
+    final Button okButton = getButton(IDialogConstants.OK_ID);
+    okButton.setEnabled(!isSameDate());
     // TODO Auto-generated method stub
     return buttonbar;
   }
+
   @Override
   protected void configureShell(final Shell newShell)
   {
@@ -88,7 +90,7 @@ public class WorkitemCopyDialog extends Dialog
   @Override
   protected Control createDialogArea(final Composite parent)
   {
-    final CalendarDay day = ((WorkItem)m_workitemsToCopy.get(0)).getDay();
+    final CalendarDay day = ((WorkItem) m_workitemsToCopy.get(0)).getDay();
 
     final Composite composite = (Composite) super.createDialogArea(parent);
     final Composite root = new Composite(composite, SWT.NONE);
@@ -96,26 +98,26 @@ public class WorkitemCopyDialog extends Dialog
 
     final Label fromDateLbl = new Label(root, SWT.NONE);
     fromDateLbl.setText(UIPlugin.getDefault().getString("dialog.workitem.copy.workitem.date.name"));
-    DateCombo fromDateCombo = new DateCombo(root, SWT.BORDER | SWT.READ_ONLY);
+    final DateCombo fromDateCombo = new DateCombo(root, SWT.BORDER | SWT.READ_ONLY);
     fromDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     fromDateCombo.select(day.getCalendar());
 
     final Label toDateLbl = new Label(root, SWT.NONE);
     toDateLbl.setText(UIPlugin.getDefault().getString("dialog.workitem.copy.workitem.newdate.name"));
-    m_toDateCombo = new DateCombo(root, SWT.BORDER );
+    m_toDateCombo = new DateCombo(root, SWT.BORDER);
     m_toDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     m_toDateCombo.select(Calendar.getInstance());
     m_toDateCombo.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(final SelectionEvent e)
       {
-        Button button = getButton(IDialogConstants.OK_ID);
+        final Button button = getButton(IDialogConstants.OK_ID);
         button.setEnabled(!isSameDate());
 
       }
     });
 
-    TableViewer tableViewer = new TableViewer(root, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
+    final TableViewer tableViewer = new TableViewer(root, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.READ_ONLY);
 
     final TableLayout layout = new TableLayout();
     layout.addColumnData(new ColumnWeightData(10, 50, true));
@@ -129,7 +131,7 @@ public class WorkitemCopyDialog extends Dialog
     tableViewer.getTable().setLinesVisible(true);
     tableViewer.getTable().setLayout(layout);
 
-    GridData gridData = new GridData(GridData.FILL_BOTH);
+    final GridData gridData = new GridData(GridData.FILL_BOTH);
     gridData.horizontalSpan = 4;
     gridData.widthHint = convertWidthInCharsToPixels(100);
     tableViewer.getTable().setLayoutData(gridData);
@@ -152,22 +154,23 @@ public class WorkitemCopyDialog extends Dialog
     final TableColumn commentColumn = new TableColumn(tableViewer.getTable(), SWT.LEFT);
     commentColumn.setText("Comment");
     commentColumn.setMoveable(false);
-    
+
     tableViewer.setContentProvider(new WorkItemCopyAndDeleteDialogTableContentProvider());
     tableViewer.setLabelProvider(new WorkItemCopyAndDeleteDialogTableLabelProvider(RepositoryFactory.getRepository()));
-    
+
     tableViewer.setInput(m_workitemsToCopy);
-  
+
     return composite;
   }
 
   private boolean isSameDate()
   {
-    Calendar calendar = m_toDateCombo.getSelection();
+    final Calendar calendar = m_toDateCombo.getSelection();
 
-    String strNewDate = String.format("%1$tY-%1$tm-%1$td", calendar.getTime());
-    String strWorkItemDate = String.format("%1$tY-%1$tm-%1$td", ((WorkItem)m_workitemsToCopy.get(0)).getDay().getDate());
-    SimpleDateFormat dateFormatter = new SimpleDateFormat("yy-MM-dd");
+    final String strNewDate = String.format("%1$tY-%1$tm-%1$td", calendar.getTime());
+    final String strWorkItemDate = String.format("%1$tY-%1$tm-%1$td", ((WorkItem) m_workitemsToCopy.get(0)).getDay()
+        .getDate());
+    final SimpleDateFormat dateFormatter = new SimpleDateFormat("yy-MM-dd");
 
     Date newDate = null;
     Date workItemDate = null;
@@ -175,19 +178,19 @@ public class WorkitemCopyDialog extends Dialog
       workItemDate = dateFormatter.parse(strWorkItemDate);
       newDate = dateFormatter.parse(strNewDate);
 
-    } catch (ParseException e) {
+    } catch (final ParseException e) {
       UIPlugin.getDefault().log(e);
     }
-
 
     return workItemDate.equals(newDate);
 
   }
+
   @Override
   protected void okPressed()
   {
-    Calendar newDate = m_toDateCombo.getSelection();
-    for(WorkItem workitem :  m_copiedWorkitems){
+    final Calendar newDate = m_toDateCombo.getSelection();
+    for (final WorkItem workitem : m_copiedWorkitems) {
       workitem.setDay(new CalendarDay(newDate));
     }
 
