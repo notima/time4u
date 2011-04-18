@@ -1,7 +1,10 @@
 Signature-Version: 1.0
-SHA1-Digest-Manifest: 3AsnYrMclwO3TlcxgnGdTGldjh8=
+SHA1-Digest-Manifest: 7W/pm1JTX1TR/GbqJpEi9vd4hkg=
 Created-By: 1.6.0 (IBM Corporation)
-SHA1-Digest-Manifest-Main-Attributes: SEkgEwb7dgQO910GiSOE16J1MMs=
+SHA1-Digest-Manifest-Main-Attributes: ER/9Wu3sNpO+yXcoPk32WaQwxAE=
+
+Name: eclipse_1310.so
+SHA1-Digest: VGrPs3JcWOiQgxMgTLtCCcVaBQo=
 
 Name: launcher.gtk.linux.x86_64.properties
 SHA1-Digest: Yib6qHdlF4Xw3Cx/cyVJRwCa+YY=
@@ -11,7 +14,4 @@ SHA1-Digest: SAqY+5ITAL0mkdYeijlSRhyIaZk=
 
 Name: about.html
 SHA1-Digest: xGcp/Hbq/ywyvVWkPzD/2vkIzdY=
-
-Name: eclipse_1302.so
-SHA1-Digest: 0qyKb+nFm1+9wnct/hep43aC/JM=
 
