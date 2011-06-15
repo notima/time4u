@@ -30,7 +30,9 @@ import org.vafada.swtcalendar.SWTCalendarEvent;
 import org.vafada.swtcalendar.SWTCalendarListener;
 import org.vafada.swtcalendar.SWTDayChooser.DayControl;
 
+
 import de.objectcode.time4u.client.store.api.IWorkItemRepository;
+import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.store.api.event.IRepositoryListener;
 import de.objectcode.time4u.client.store.api.event.RepositoryEvent;
@@ -45,7 +47,10 @@ import de.objectcode.time4u.client.ui.util.SelectionServiceAdapter;
 import de.objectcode.time4u.server.api.data.CalendarDay;
 import de.objectcode.time4u.server.api.data.DayInfo;
 import de.objectcode.time4u.server.api.data.DayTag;
+import de.objectcode.time4u.server.api.data.TimePolicy;
+import de.objectcode.time4u.server.api.data.WeekTimePolicy;
 import de.objectcode.time4u.server.api.data.WorkItem;
+import de.objectcode.time4u.server.api.filter.TimePolicyFilter;
 
 public class CalendarView extends ViewPart implements SWTCalendarListener, IRepositoryListener
 {
@@ -361,12 +366,35 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       if(this.isChecked()){
         m_currentTags.add(m_dayTag.getName());
       }
+      
       try {
+        Integer regularTime = getRegularTime();
         RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(m_currentDay, m_currentDay,
-            m_dayTag.getRegularTime(), m_currentTags);
+            regularTime, m_currentTags);
       } catch (final Exception e) {
         UIPlugin.getDefault().log(e);
       }
+    }
+
+    private Integer getRegularTime() throws RepositoryException
+    {
+      
+      if(!m_currentTags.isEmpty()){
+        return m_dayTag.getRegularTime();
+      }
+      
+      List<TimePolicy> timePolicies = RepositoryFactory.getRepository().getWorkItemRepository().getTimePolicies(TimePolicyFilter.all());
+      Integer regularTime = -1;
+      
+      for (TimePolicy timePolicy : timePolicies) {
+        regularTime = ((WeekTimePolicy)timePolicy).getRegularTime(m_currentDay);
+
+        if(regularTime >= 0){
+          break;
+        }
+      }
+      
+      return regularTime;
     }
 
     private void makeOneItemSelected()
@@ -379,9 +407,6 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
           action.setChecked(false);
         }
       }
-
     }
-
-
   }
 }
