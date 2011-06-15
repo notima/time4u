@@ -330,6 +330,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     CalendarDay m_currentDay;
     Set<String> m_currentTags;
     DayTag m_dayTag;
+    boolean m_checked;
 
     SetDayTagAction(final CalendarDay currentDay, final int regularTime, final Set<String> currentTags,
         final DayTag dayTag)
@@ -342,8 +343,9 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       m_currentDay = currentDay;
       m_currentTags = currentTags;
       m_dayTag = dayTag;
-
-      setChecked(m_currentTags.contains(m_dayTag.getName()));
+      m_checked = m_currentTags.contains(m_dayTag.getName());
+      
+      setChecked(m_checked);
 
       if (!currentTags.isEmpty()) {
         setEnabled(currentTags.contains(dayTag.getName()) || dayTag.getRegularTime() == null
@@ -369,8 +371,13 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
     private void makeOneItemSelected()
     {
-      for (final SetDayTagAction action : actions) {
-        action.setChecked(action == this && this.isChecked());
+      for (SetDayTagAction action : actions) {
+        if(action == this){
+          m_checked = !m_checked;
+          action.setChecked(m_checked);
+        } else {
+          action.setChecked(false);
+        }
       }
 
     }
