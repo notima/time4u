@@ -59,6 +59,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
   int m_refreshCounter = 0;
 
   private CompoundSelectionProvider m_selectionProvider;
+  private Set<SetDayTagAction> actions;
 
   Font m_boldFont;
   Font m_italicFont;
@@ -132,6 +133,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       UIPlugin.getDefault().log(e);
     }
 
+    actions = new HashSet<SetDayTagAction>();
     final MenuManager menuMgr = new MenuManager();
 
     menuMgr.setRemoveAllWhenShown(true);
@@ -155,7 +157,9 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
           if (!dayTags.isEmpty()) {
             menuMgr.add(new Separator());
             for (final DayTag dayTag : dayTags) {
-              menuMgr.add(new SetDayTagAction(selection, regularTime, currentTags, dayTag));
+              SetDayTagAction action = new SetDayTagAction(selection, regularTime, currentTags, dayTag);
+              menuMgr.add(action);
+              actions.add(action);
             }
           }
         } catch (final Exception e) {
@@ -321,7 +325,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     }
   }
 
-  static class SetDayTagAction extends Action
+  class SetDayTagAction extends Action
   {
     CalendarDay m_currentDay;
     Set<String> m_currentTags;
@@ -330,7 +334,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     SetDayTagAction(final CalendarDay currentDay, final int regularTime, final Set<String> currentTags,
         final DayTag dayTag)
         {
-      super(dayTag.getName(), Action.AS_CHECK_BOX);
+      super(dayTag.getName(), Action.AS_RADIO_BUTTON);
 
       setText(dayTag.getLabel());
       setToolTipText(dayTag.getDescription());
@@ -350,12 +354,11 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     @Override
     public void run()
     {
-      if (m_currentTags.contains(m_dayTag.getName())) {
-        m_currentTags.remove(m_dayTag.getName());
-      } else {
+      makeOneItemSelected();
+      m_currentTags.clear();
+      if(this.isChecked()){
         m_currentTags.add(m_dayTag.getName());
       }
-
       try {
         RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(m_currentDay, m_currentDay,
             m_dayTag.getRegularTime(), m_currentTags);
@@ -363,5 +366,15 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
         UIPlugin.getDefault().log(e);
       }
     }
+
+    private void makeOneItemSelected()
+    {
+      for (final SetDayTagAction action : actions) {
+        action.setChecked(action == this && this.isChecked());
+      }
+
+    }
+
+
   }
 }
