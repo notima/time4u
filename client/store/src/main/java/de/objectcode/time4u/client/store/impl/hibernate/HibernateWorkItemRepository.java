@@ -200,7 +200,7 @@ public class HibernateWorkItemRepository implements IWorkItemRepository
     for (final TimePolicy timePolicy : timePolicies) {
       regularTime = ((WeekTimePolicy)timePolicy).getRegularTime(calendarDay);
 
-      if(regularTime >= 0){
+      if(regularTime > 0){
         break;
       }
     }
