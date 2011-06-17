@@ -16,6 +16,7 @@ import org.hibernate.criterion.Restrictions;
 
 import de.objectcode.time4u.client.store.api.IWorkItemRepository;
 import de.objectcode.time4u.client.store.api.RepositoryException;
+import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.store.api.event.ActiveWorkItemRepositoryEvent;
 import de.objectcode.time4u.client.store.api.event.DayInfoRepositoryEvent;
 import de.objectcode.time4u.client.store.api.event.TimePolicyRepositoryEvent;
@@ -191,6 +192,20 @@ public class HibernateWorkItemRepository implements IWorkItemRepository
     });
   }
 
+  public Integer getRegularTimeFromTimePolicy(CalendarDay calendarDay) throws RepositoryException{
+    
+    final List<TimePolicy> timePolicies = RepositoryFactory.getRepository().getWorkItemRepository().getTimePolicies(TimePolicyFilter.all());
+    Integer regularTime = -1;
+
+    for (final TimePolicy timePolicy : timePolicies) {
+      regularTime = ((WeekTimePolicy)timePolicy).getRegularTime(calendarDay);
+
+      if(regularTime >= 0){
+        break;
+      }
+    }
+    return regularTime;
+  }
   /**
    * {@inheritDoc}
    */
