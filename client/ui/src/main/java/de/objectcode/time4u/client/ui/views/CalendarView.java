@@ -9,6 +9,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -64,11 +65,17 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
   int m_refreshCounter = 0;
 
   private CompoundSelectionProvider m_selectionProvider;
-  private Set<SetDayTagAction> actions;
+  private final Set<SetDayTagAction> m_dayTagActions;
+  private final Set<TimePolicyAction> m_timePolicyActions;
 
   Font m_boldFont;
   Font m_italicFont;
 
+  public CalendarView()
+  {
+    m_dayTagActions = new HashSet<CalendarView.SetDayTagAction>();
+    m_timePolicyActions = new HashSet<CalendarView.TimePolicyAction>();
+  }
   /**
    * This is a callback that will allow us to create the viewer and initialize it.
    */
@@ -138,40 +145,10 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       UIPlugin.getDefault().log(e);
     }
 
-    actions = new HashSet<SetDayTagAction>();
     final MenuManager menuMgr = new MenuManager();
 
     menuMgr.setRemoveAllWhenShown(true);
-    menuMgr.addMenuListener(new IMenuListener() {
-      public void menuAboutToShow(final IMenuManager manager)
-      {
-        menuMgr.add(new GroupMarker("calendarGroup"));
-        menuMgr.add(new Separator());
-        menuMgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-        final CalendarDay selection = ((List<CalendarDay>)m_selectionProvider
-            .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
-        Assert.isNotNull(selection);
-
-        try {
-          final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(selection);
-          final List<DayTag> dayTags = RepositoryFactory.getRepository().getWorkItemRepository().getDayTags();
-
-          final Set<String> currentTags = dayInfo != null ? dayInfo.getTags() : new HashSet<String>();
-          final int regularTime = dayInfo != null ? dayInfo.getRegularTime() : -1;
-
-          if (!dayTags.isEmpty()) {
-            menuMgr.add(new Separator());
-            for (final DayTag dayTag : dayTags) {
-              SetDayTagAction action = new SetDayTagAction(selection, regularTime, currentTags, dayTag);
-              menuMgr.add(action);
-              actions.add(action);
-            }
-          }
-        } catch (final Exception e) {
-          UIPlugin.getDefault().log(e);
-        }
-      }
-    });
+    menuMgr.addMenuListener(createMenuListener(menuMgr));
 
     final Menu menu = menuMgr.createContextMenu(m_calendar);
 
@@ -182,6 +159,57 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     RepositoryFactory.getRepository().addRepositoryListener(RepositoryEventType.DAYINFO, this);
     RepositoryFactory.getRepository().addRepositoryListener(RepositoryEventType.TIMEPOLICY, this);
   }
+
+  public IMenuListener createMenuListener(final MenuManager menuMgr){
+
+    IMenuListener menuListener = new IMenuListener() {
+      public void menuAboutToShow(final IMenuManager manager )
+      {
+        try {
+          final CalendarDay selection = ((List<CalendarDay>)m_selectionProvider
+              .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
+          final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(selection);
+          final List<DayTag> dayTags = RepositoryFactory.getRepository().getWorkItemRepository().getDayTags();
+
+          boolean hasNoTags = dayInfo != null?!dayInfo.isHasTags():true;
+          TimePolicyAction markFreeDayAction = new TimePolicyAction("action.timepolicy.markfree.label" 
+              ,"de.objectcode.time4u.client.ui.timepolicy.markfree" , dayInfo != null && dayInfo.getRegularTime() == 0, hasNoTags);
+          TimePolicyAction markRegularDayAction = new TimePolicyAction("action.timepolicy.markregular.label" 
+              ,"de.objectcode.time4u.client.ui.timepolicy.markregular" , 
+              dayInfo != null && (dayInfo.getRegularTime() < 0 || dayInfo.getRegularTime() > 0), hasNoTags);
+
+          menuMgr.add(markRegularDayAction);
+          menuMgr.add(markFreeDayAction);
+
+          m_timePolicyActions.clear();
+          m_timePolicyActions.add(markFreeDayAction);
+          m_timePolicyActions.add(markRegularDayAction);
+
+          menuMgr.add(new GroupMarker("calendarGroup"));
+          menuMgr.add(new Separator());
+          menuMgr.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+          Assert.isNotNull(selection);
+
+          final Set<String> currentTags = dayInfo != null ? dayInfo.getTags() : new HashSet<String>();
+          final int regularTime = dayInfo != null ? dayInfo.getRegularTime() : -1;
+
+          if (!dayTags.isEmpty()) {
+            menuMgr.add(new Separator());
+            m_dayTagActions.clear();
+            for (final DayTag dayTag : dayTags) {
+              SetDayTagAction action = new SetDayTagAction(selection, regularTime, currentTags, dayTag);
+              menuMgr.add(action);
+              m_dayTagActions.add(action);
+            }
+          }
+        } catch (final Exception e) {
+          UIPlugin.getDefault().log(e);
+        }
+      }
+    };
+    return menuListener;
+  }
+
 
   /**
    * {@inheritDoc}
@@ -330,6 +358,59 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     }
   }
 
+  class TimePolicyAction extends Action{
+    boolean m_checked;
+
+    TimePolicyAction(String textId, String actionId, boolean checked, boolean enabled )
+    {
+      super(null, Action.AS_CHECK_BOX);
+
+      String text = UIPlugin.getDefault().getString(textId);
+      setId(actionId);
+      setText(text);
+      setToolTipText(text);
+      setChecked(checked);
+      setEnabled(enabled);
+      m_checked = checked;
+    }
+
+    @Override
+    public void run()
+    {
+      deSelectAllActions();
+      final CalendarDay selectedDay = ((List<CalendarDay>)m_selectionProvider
+          .getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
+      final String id = this.getId();
+      if ("de.objectcode.time4u.client.ui.timepolicy.markregular".equals(id)) {
+        if (selectedDay != null) {
+          try {
+            RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(selectedDay, selectedDay, -1, null);
+          } catch (final Exception e) {
+            UIPlugin.getDefault().log(e);
+          }
+        }
+      } else if ("de.objectcode.time4u.client.ui.timepolicy.markfree".equals(id)) {
+        if (selectedDay != null) {
+          try {
+            RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(selectedDay, selectedDay, 0, null);
+          } catch (final Exception e) {
+            UIPlugin.getDefault().log(e);
+          }
+        }
+      }
+      m_checked = !m_checked;
+      setChecked(m_checked);
+    }
+
+    private void deSelectAllActions()
+    {
+      for (TimePolicyAction timePolicyAction : m_timePolicyActions) {
+        timePolicyAction.setChecked(false);
+      }
+
+    }
+  }
+
   class SetDayTagAction extends Action
   {
     CalendarDay m_currentDay;
@@ -349,13 +430,9 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       m_currentTags = currentTags;
       m_dayTag = dayTag;
       m_checked = m_currentTags.contains(m_dayTag.getName());
-      
+
       setChecked(m_checked);
 
-      if (!currentTags.isEmpty()) {
-        setEnabled(currentTags.contains(dayTag.getName()) || dayTag.getRegularTime() == null
-            || dayTag.getRegularTime() == regularTime);
-      }
         }
 
     @Override
@@ -366,7 +443,7 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       if(this.isChecked()){
         m_currentTags.add(m_dayTag.getName());
       }
-      
+
       try {
         Integer regularTime = getRegularTime();
         RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(m_currentDay, m_currentDay,
@@ -378,28 +455,19 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
     private Integer getRegularTime() throws RepositoryException
     {
-      
+
       if(!m_currentTags.isEmpty()){
         return m_dayTag.getRegularTime();
       }
-      
-      List<TimePolicy> timePolicies = RepositoryFactory.getRepository().getWorkItemRepository().getTimePolicies(TimePolicyFilter.all());
-      Integer regularTime = -1;
-      
-      for (TimePolicy timePolicy : timePolicies) {
-        regularTime = ((WeekTimePolicy)timePolicy).getRegularTime(m_currentDay);
 
-        if(regularTime >= 0){
-          break;
-        }
-      }
-      
+      Integer regularTime = RepositoryFactory.getRepository().getWorkItemRepository().getRegularTimeFromTimePolicy(m_currentDay);
+
       return regularTime;
     }
 
     private void makeOneItemSelected()
     {
-      for (SetDayTagAction action : actions) {
+      for (SetDayTagAction action : m_dayTagActions) {
         if(action == this){
           m_checked = !m_checked;
           action.setChecked(m_checked);

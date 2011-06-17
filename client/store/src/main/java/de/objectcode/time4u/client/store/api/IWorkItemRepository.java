@@ -64,6 +64,17 @@ public interface IWorkItemRepository
   List<DayInfo> getDayInfos(DayInfoFilter filter) throws RepositoryException;
 
   /**
+   * Get the regulartime from the timepolicy.
+   * 
+   * @param calendarDay
+   *          The date
+   * @return the regulartime from the TimePolicy
+   * @throws RepositoryException
+   *           on error
+   */
+  Integer getRegularTimeFromTimePolicy(CalendarDay calendarDay) throws RepositoryException;
+  
+  /**
    * Store a complete dayinfo.
    * 
    * This also stores/modifies all workitems for that day.
