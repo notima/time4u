@@ -301,7 +301,7 @@
          </property>
          <property
                name="windowImages"
-               value="icons/Time4U.gif,icons/Time4U_32.gif,icons/Time4U_48.gif,icons/Time4U_64.gif,icons/Time4U_128.gif">
+               value="/time4u-client-ui/icons/Time4U.gif,/time4u-client-ui/icons/Time4U_32.gif,/time4u-client-ui/icons/Time4U_48.gif,/time4u-client-ui/icons/Time4U_64.gif,/time4u-client-ui/icons/Time4U_128.gif">
          </property>
          <property
                name="startupForegroundColor"
@@ -623,20 +623,6 @@
                </objectState>
             </and>
          </visibility>
-         <action
-               class="de.objectcode.time4u.client.ui.actions.TimePolicyActionDelegate"
-               id="de.objectcode.time4u.client.ui.timepolicy.markfree"
-               label="%action.timepolicy.markfree.label"
-               menubarPath="calendarGroup"
-               tooltip="%action.timepolicy.markfree.tooltip">
-         </action>
-         <action
-               class="de.objectcode.time4u.client.ui.actions.TimePolicyActionDelegate"
-               id="de.objectcode.time4u.client.ui.timepolicy.markregular"
-               label="%action.timepolicy.markregular.label"
-               menubarPath="calendarGroup"
-               tooltip="%action.timepolicy.markregular.tooltip">
-         </action>
          <action
                class="de.objectcode.time4u.client.ui.actions.TimePolicyActionDelegate"
                id="de.objectcode.time4u.client.ui.timepolicy.override"
@@ -1162,10 +1148,11 @@
          </action>
          <action
                class="de.objectcode.time4u.client.ui.actions.TimePolicyActionDelegate"
+               enablesFor="?"
                id="de.objectcode.time4u.client.ui.timepolicy.markfree"
                label="%action.timepolicy.markfree.label"
                menubarPath="workItemMenu/timePolicyGroup"
-               style="push"
+               style="radio"
                tooltip="%action.timepolicy.markfree.tooltip">
             <enablement>
                <and>
@@ -1176,15 +1163,20 @@
                         name="has"
                         value="CALENDARDAY">
                   </objectState>
+                  <objectState
+                        name="hasNoTags"
+                        value="true">
+                  </objectState>                                           
                </and>
             </enablement>
          </action>
          <action
                class="de.objectcode.time4u.client.ui.actions.TimePolicyActionDelegate"
+               enablesFor="?"
                id="de.objectcode.time4u.client.ui.timepolicy.markregular"
                label="%action.timepolicy.markregular.label"
                menubarPath="workItemMenu/timePolicyGroup"
-               style="push"
+               style="radio"
                tooltip="%action.timepolicy.markregular.tooltip">
             <enablement>
                <and>
@@ -1195,6 +1187,10 @@
                         name="has"
                         value="CALENDARDAY">
                   </objectState>
+                  <objectState
+                        name="hasNoTags"
+                        value="true">
+                  </objectState>                                          
                </and>
             </enablement>
          </action>

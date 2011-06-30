@@ -475,7 +475,10 @@ public class HibernateWorkItemRepository implements IWorkItemRepository
 
                 if (regularTime != null) {
                   dayInfoEntity.setRegularTime(regularTime);
+                } else {
+                  dayInfoEntity.setRegularTime(-1);
                 }
+                
                 if (tags != null) {
                   final Set<DayTagEntity> dayTags = new HashSet<DayTagEntity>();
 
@@ -496,6 +499,8 @@ public class HibernateWorkItemRepository implements IWorkItemRepository
                 dayInfoEntity.setLastModifiedByClient(m_repository.getClientId());
                 if (regularTime != null) {
                   dayInfoEntity.setRegularTime(regularTime);
+                } else {
+                  dayInfoEntity.setRegularTime(-1);
                 }
                 if (tags != null) {
                   final Iterator<DayTagEntity> it = dayInfoEntity.getTags().iterator();

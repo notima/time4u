@@ -9,10 +9,13 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IActionFilter;
 
+import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.ui.UIPlugin;
 import de.objectcode.time4u.client.ui.util.CompoundSelection;
 import de.objectcode.time4u.client.ui.util.CompoundSelectionEntityType;
+import de.objectcode.time4u.server.api.data.CalendarDay;
+import de.objectcode.time4u.server.api.data.DayInfo;
 import de.objectcode.time4u.server.api.data.Project;
 import de.objectcode.time4u.server.api.data.ProjectSummary;
 import de.objectcode.time4u.server.api.data.Task;
@@ -51,7 +54,16 @@ public class CompoundSelectionAdapterFactory implements IAdapterFactory
 
       if ("has".equals(name)) {
         return selection.getSelection(CompoundSelectionEntityType.valueOf(value)) != null;
-      } else if ("PROJECT.active".equals(name)) {
+      } else if ("hasNoTags".equals(name)) {
+        final CalendarDay day = ((List<CalendarDay>) selection.getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
+        try {
+          final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(day);
+          return dayInfo.getTags() != null && dayInfo.getTags().isEmpty();
+        } catch (RepositoryException e) {
+          UIPlugin.getDefault().log(e);
+        }
+      }
+        else if ("PROJECT.active".equals(name)) {
         List projectSelection = (List)selection.getSelection(CompoundSelectionEntityType.PROJECT);
         ProjectSummary project = null; 
 
