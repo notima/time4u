@@ -14,12 +14,14 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowPulldownDelegate2;
 
+import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
 import de.objectcode.time4u.client.ui.UIPlugin;
 import de.objectcode.time4u.server.api.data.CalendarDay;
@@ -127,9 +129,8 @@ public class DayInfoActionDelegate implements IWorkbenchWindowPulldownDelegate2
       final CalendarDay selection = (CalendarDay) m_selection.getAdapter(CalendarDay.class);
       final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(selection);
       final List<DayTag> dayTags = RepositoryFactory.getRepository().getWorkItemRepository().getDayTags();
-
       final Set<String> currentTags = dayInfo != null ? dayInfo.getTags() : new HashSet<String>();
-      final int regularTime = dayInfo != null ? dayInfo.getRegularTime() : -1;
+
 
       if (!dayTags.isEmpty()) {
         for (final DayTag dayTag : dayTags) {
@@ -138,33 +139,79 @@ public class DayInfoActionDelegate implements IWorkbenchWindowPulldownDelegate2
           item.setText(dayTag.getLabel());
           item.setSelection(currentTags.contains(dayTag.getName()));
 
-          if (!currentTags.isEmpty()) {
-            item.setEnabled(currentTags.contains(dayTag.getName()) || dayTag.getRegularTime() == null
-                || dayTag.getRegularTime() == regularTime);
-          }
-
-          item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e)
-            {
-              if (currentTags.contains(dayTag.getName())) {
-                currentTags.remove(dayTag.getName());
-              } else {
-                currentTags.add(dayTag.getName());
-              }
-
-              try {
-                RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(selection, selection,
-                    dayTag.getRegularTime(), currentTags);
-              } catch (final Exception ex) {
-                UIPlugin.getDefault().log(ex);
-              }
-            }
-          });
+          item.addSelectionListener(createSelectionListener(dayTag, item, menu));
         }
-      }
-    } catch (final Exception e) {
+      } 
+    }catch (final Exception e) {
       UIPlugin.getDefault().log(e);
     }
+  }
+
+  private void handleTimePolicySelection(Menu menu) throws RepositoryException
+  {
+    final MenuItem[] items = menu.getItems();
+    final CalendarDay selection = (CalendarDay) m_selection.getAdapter(CalendarDay.class);
+    final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(selection);
+    final boolean hasNoTags = dayInfo != null?!dayInfo.isHasTags():true;
+    final String markFreeDay = UIPlugin.getDefault().getString("action.timepolicy.markfree.label");
+    final String markRegularDay = UIPlugin.getDefault().getString("action.timepolicy.markregular.label");
+
+    for (final MenuItem menuItem : items) {
+      if(menuItem.getText().equals(UIPlugin.getDefault().getString("menu.workItem.label"))){
+
+        for(MenuItem item : menuItem.getMenu().getItems()){
+          String text = item.getText();
+
+          if(text.equals(markFreeDay)){
+            item.setEnabled(hasNoTags);
+            item.setSelection(dayInfo != null && dayInfo.getRegularTime() == 0);
+          } else if(text.equals(markRegularDay)){
+            item.setEnabled(hasNoTags);
+            item.setSelection(dayInfo != null && (dayInfo.getRegularTime() < 0 || dayInfo.getRegularTime() > 0));
+          }
+        }
+      }
+
+    }
+
+  }
+
+  private SelectionListener createSelectionListener( 
+      final DayTag dayTag, final MenuItem item, final Menu menu)
+  {
+    return new SelectionAdapter() {
+      @Override
+      public void widgetSelected(final SelectionEvent e)
+      {
+        try {
+          final Menu parentMenu = menu.getParent().getMenuBar();
+          final CalendarDay selection = (CalendarDay) m_selection.getAdapter(CalendarDay.class);
+          final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(selection);
+          final Set<String> currentTags = dayInfo != null ? dayInfo.getTags() : new HashSet<String>();
+          currentTags.clear();
+          if(item.getSelection()){
+            currentTags.add(dayTag.getName());
+          }
+
+          final Integer regularTime = getRegularTime(currentTags);
+          RepositoryFactory.getRepository().getWorkItemRepository().setRegularTime(selection, selection,
+              regularTime, currentTags);
+          handleTimePolicySelection( parentMenu);
+        } catch (final Exception ex) {
+          UIPlugin.getDefault().log(ex);
+        }
+      }
+
+      private Integer getRegularTime(Set<String> currentTags) throws RepositoryException
+      {
+        if(!currentTags.isEmpty()){
+          return dayTag.getRegularTime();
+        }
+        final CalendarDay selection = (CalendarDay) m_selection.getAdapter(CalendarDay.class);
+        final Integer regularTime = RepositoryFactory.getRepository().getWorkItemRepository().getRegularTimeFromTimePolicy(selection);
+
+        return regularTime;
+      }
+    };
   }
 }

@@ -30,8 +30,6 @@ import org.vafada.swtcalendar.SWTCalendar;
 import org.vafada.swtcalendar.SWTCalendarEvent;
 import org.vafada.swtcalendar.SWTCalendarListener;
 import org.vafada.swtcalendar.SWTDayChooser.DayControl;
-
-
 import de.objectcode.time4u.client.store.api.IWorkItemRepository;
 import de.objectcode.time4u.client.store.api.RepositoryException;
 import de.objectcode.time4u.client.store.api.RepositoryFactory;
@@ -48,10 +46,7 @@ import de.objectcode.time4u.client.ui.util.SelectionServiceAdapter;
 import de.objectcode.time4u.server.api.data.CalendarDay;
 import de.objectcode.time4u.server.api.data.DayInfo;
 import de.objectcode.time4u.server.api.data.DayTag;
-import de.objectcode.time4u.server.api.data.TimePolicy;
-import de.objectcode.time4u.server.api.data.WeekTimePolicy;
 import de.objectcode.time4u.server.api.data.WorkItem;
-import de.objectcode.time4u.server.api.filter.TimePolicyFilter;
 
 public class CalendarView extends ViewPart implements SWTCalendarListener, IRepositoryListener
 {
@@ -65,7 +60,6 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
   int m_refreshCounter = 0;
 
   private CompoundSelectionProvider m_selectionProvider;
-  private final Set<SetDayTagAction> m_dayTagActions;
   private final Set<TimePolicyAction> m_timePolicyActions;
 
   Font m_boldFont;
@@ -73,7 +67,6 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
   public CalendarView()
   {
-    m_dayTagActions = new HashSet<CalendarView.SetDayTagAction>();
     m_timePolicyActions = new HashSet<CalendarView.TimePolicyAction>();
   }
   /**
@@ -195,11 +188,9 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
           if (!dayTags.isEmpty()) {
             menuMgr.add(new Separator());
-            m_dayTagActions.clear();
             for (final DayTag dayTag : dayTags) {
               SetDayTagAction action = new SetDayTagAction(selection, regularTime, currentTags, dayTag);
               menuMgr.add(action);
-              m_dayTagActions.add(action);
             }
           }
         } catch (final Exception e) {
@@ -418,9 +409,9 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
     DayTag m_dayTag;
     boolean m_checked;
 
-    SetDayTagAction(final CalendarDay currentDay, final int regularTime, final Set<String> currentTags,
+    public SetDayTagAction(final CalendarDay currentDay, final int regularTime, final Set<String> currentTags,
         final DayTag dayTag)
-        {
+    {
       super(dayTag.getName(), Action.AS_RADIO_BUTTON);
 
       setText(dayTag.getLabel());
@@ -433,12 +424,11 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
       setChecked(m_checked);
 
-        }
+    }
 
     @Override
     public void run()
     {
-      makeOneItemSelected();
       m_currentTags.clear();
       if(this.isChecked()){
         m_currentTags.add(m_dayTag.getName());
@@ -455,7 +445,6 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
 
     private Integer getRegularTime() throws RepositoryException
     {
-
       if(!m_currentTags.isEmpty()){
         return m_dayTag.getRegularTime();
       }
@@ -465,16 +454,6 @@ public class CalendarView extends ViewPart implements SWTCalendarListener, IRepo
       return regularTime;
     }
 
-    private void makeOneItemSelected()
-    {
-      for (SetDayTagAction action : m_dayTagActions) {
-        if(action == this){
-          m_checked = !m_checked;
-          action.setChecked(m_checked);
-        } else {
-          action.setChecked(false);
-        }
-      }
-    }
   }
+  
 }

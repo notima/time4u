@@ -89,7 +89,8 @@ public class CalendarDay implements Serializable, Comparable<CalendarDay>
     final Calendar calendar = Calendar.getInstance();
 
     calendar.set(m_year, m_month - 1, m_day, 0, 0, 0);
-
+    calendar.set(Calendar.MILLISECOND, 0);
+    
     return calendar;
   }
 
@@ -99,7 +100,8 @@ public class CalendarDay implements Serializable, Comparable<CalendarDay>
     final Calendar calendar = Calendar.getInstance();
 
     calendar.set(m_year, m_month - 1, m_day, 0, 0, 0);
-
+    calendar.set(Calendar.MILLISECOND, 0);
+    
     return new Date(calendar.getTimeInMillis());
   }
 
