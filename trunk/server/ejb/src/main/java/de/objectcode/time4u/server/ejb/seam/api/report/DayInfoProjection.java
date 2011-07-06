@@ -2,16 +2,19 @@ package de.objectcode.time4u.server.ejb.seam.api.report;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
 import de.objectcode.time4u.server.api.data.TimeContingent;
+import de.objectcode.time4u.server.entities.DayInfoEntity;
 import de.objectcode.time4u.server.entities.DayTagEntity;
+import de.objectcode.time4u.server.entities.TimePolicyEntity;
+import de.objectcode.time4u.server.entities.WeekTimePolicyEntity;
 
 @XmlEnum
 @XmlType(name = "dayinfo-projection")
@@ -42,10 +45,35 @@ public enum DayInfoProjection implements IProjection
       return new SumAggregation();
     }
   },
-  REGULAR_TIME(ColumnType.TIME, "Regular time") {
+  REGULAR_TIME(ColumnType.TIME, "Effective regular time") {
     public Object project(final IRowDataAdapter rowData)
     {
       return rowData.getDayInfo().getEffectiveRegularTime();
+    }
+
+    @Override
+    public IAggregation createAggregation()
+    {
+      return new SumAggregation();
+    }
+  },
+  STANDARD_TIME(ColumnType.TIME, "Standard time") {
+    public Object project(final IRowDataAdapter rowData)
+    {
+      List<TimePolicyEntity> timePolicies = rowData.getTimePolicies();
+      java.sql.Date calendarDay = rowData.getDayInfo().getDate();
+      int regularTime = 0;
+      for (TimePolicyEntity timePolicyEntity : timePolicies) {
+        regularTime = ((WeekTimePolicyEntity)timePolicyEntity).getRegularTime(calendarDay);
+        if(regularTime > 0){
+          break;
+        }
+      }
+
+      if(regularTime <= 0){
+        regularTime = DayInfoEntity.DEFAULT_REGULARTIME;
+      }
+      return regularTime;
     }
 
     @Override
@@ -84,7 +112,6 @@ public enum DayInfoProjection implements IProjection
   },
   MONTH(ColumnType.NAME, "Month")
   {
-    @Override
     public Object project(IRowDataAdapter rowData)
     {
       SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMMM");
