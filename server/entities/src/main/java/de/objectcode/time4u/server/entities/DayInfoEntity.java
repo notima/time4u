@@ -44,7 +44,7 @@ import de.objectcode.time4u.server.entities.context.IPersistenceContext;
 @Table(name = "T4U_DAYINFOS", uniqueConstraints = @UniqueConstraint(columnNames = { "person_id", "daydate" }))
 public class DayInfoEntity
 {
-  private static int DEFAULT_REGULARTIME = 8 * 3600;
+  public static int DEFAULT_REGULARTIME = 8 * 3600;
 
   /** Primary key */
   private String m_id;

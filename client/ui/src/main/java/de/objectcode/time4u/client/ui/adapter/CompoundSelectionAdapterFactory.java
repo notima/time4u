@@ -58,7 +58,7 @@ public class CompoundSelectionAdapterFactory implements IAdapterFactory
         final CalendarDay day = ((List<CalendarDay>) selection.getSelection(CompoundSelectionEntityType.CALENDARDAY)).get(0);
         try {
           final DayInfo dayInfo = RepositoryFactory.getRepository().getWorkItemRepository().getDayInfo(day);
-          return dayInfo.getTags() != null && dayInfo.getTags().isEmpty();
+          return dayInfo != null && dayInfo.getTags() != null && dayInfo.getTags().isEmpty();
         } catch (RepositoryException e) {
           UIPlugin.getDefault().log(e);
         }
