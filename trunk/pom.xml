@@ -23,6 +23,16 @@
 				url>sftp://web.sourceforge.net/home/groups/t/ti/time4u/htdocs</url -->
 			<url>file:///srv/www/htdocs/time4u-site</url>
 		</site>
+		<repository>
+    		<id>releases</id>
+    		<name>Release repository</name>
+    		<url>http://localhost:8081/artifactory/libs-release-local</url>
+  		</repository>
+	    <snapshotRepository>
+    		<id>Snapshots</id>
+            <name>Snapshots repository</name>
+            <url>http://localhost:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
 	</distributionManagement>
 	<url>http://time4u.sourceforge.net</url>
 	<description>Time-Tracking tool with client-server synchronization.</description>
