@@ -88,7 +88,7 @@
 	</build>
 	<profiles>
 	  <profile>
-	    <id>ci-deploy</id>
+	    <id>ci-deploy-snapshot</id>
 	    <build>
 	      <plugins>
 		<plugin>
@@ -102,6 +102,8 @@
 		      </goals>
 		      <configuration>
 			<file>target/RPMS/noarch/time4u-server-${time4u.version}-${buildNumber}.noarch.rpm</file>
+			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
+			<repositoryId>snapshots</repositoryId>
 			<packaging>rpm</packaging>
 		      </configuration>
 		    </execution>
