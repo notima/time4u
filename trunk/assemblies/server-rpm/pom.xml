@@ -86,4 +86,29 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+	  <profile>
+	    <id>ci-deploy</id>
+	    <build>
+	      <plugins>
+		<plugin>
+		  <artifactId>maven-deploy-plugin</artifactId>
+		  <executions>
+		    <execution>
+		      <id>deploy-server-rpm</id>
+		      <phase>deploy</phase>
+		      <goals>
+			<goal>deploy-file</goal>
+		      </goals>
+		      <configuration>
+			<file>target/RPMS/noarch/time4u-server-${time4u.version}-${buildNumber}.noarch.rpm</file>
+			<packaging>rpm</packaging>
+		      </configuration>
+		    </execution>
+		  </executions>
+		</plugin>
+	      </plugins>
+	    </build>
+	  </profile>
+	</profiles>
 </project>
