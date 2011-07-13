@@ -105,6 +105,9 @@
 			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
 			<repositoryId>snapshots</repositoryId>
 			<packaging>rpm</packaging>
+			<groupId>de.objectcode.time4u.assemblies</groupId>
+			<artifactId>time4u-server-rpm</artifactId>
+			<version>${project.version}</version>
 		      </configuration>
 		    </execution>
 		  </executions>
