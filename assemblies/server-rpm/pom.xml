@@ -110,6 +110,57 @@
 			<version>${project.version}</version>
 		      </configuration>
 		    </execution>
+		    <execution>
+		      <id>deploy-server-rpm-mysql</id>
+		      <phase>deploy</phase>
+		      <goals>
+			<goal>deploy-file</goal>
+		      </goals>
+		      <configuration>
+			<file>target/RPMS/noarch/time4u-server-mysql-${time4u.version}-${buildNumber}.noarch.rpm</file>
+			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
+			<repositoryId>snapshots</repositoryId>
+			<packaging>rpm</packaging>
+			<groupId>de.objectcode.time4u.assemblies</groupId>
+			<artifactId>time4u-server-rpm</artifactId>
+			<classifier>mysql</classifier>
+			<version>${project.version}</version>
+		      </configuration>
+		    </execution>
+		    <execution>
+		      <id>deploy-server-rpm-postgres</id>
+		      <phase>deploy</phase>
+		      <goals>
+			<goal>deploy-file</goal>
+		      </goals>
+		      <configuration>
+			<file>target/RPMS/noarch/time4u-server-postgres-${time4u.version}-${buildNumber}.noarch.rpm</file>
+			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
+			<repositoryId>snapshots</repositoryId>
+			<packaging>rpm</packaging>
+			<groupId>de.objectcode.time4u.assemblies</groupId>
+			<artifactId>time4u-server-rpm</artifactId>
+			<classifier>postgres</classifier>
+			<version>${project.version}</version>
+		      </configuration>
+		    </execution>
+		    <execution>
+		      <id>deploy-server-rpm-apache</id>
+		      <phase>deploy</phase>
+		      <goals>
+			<goal>deploy-file</goal>
+		      </goals>
+		      <configuration>
+			<file>target/RPMS/noarch/time4u-server-apache-${time4u.version}-${buildNumber}.noarch.rpm</file>
+			<url>http://localhost:8081/artifactory/libs-snapshot-local</url>
+			<repositoryId>snapshots</repositoryId>
+			<packaging>rpm</packaging>
+			<groupId>de.objectcode.time4u.assemblies</groupId>
+			<artifactId>time4u-server-rpm</artifactId>
+			<classifier>apache</classifier>
+			<version>${project.version}</version>
+		      </configuration>
+		    </execution>
 		  </executions>
 		</plugin>
 	      </plugins>
