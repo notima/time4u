@@ -2,12 +2,10 @@ Summary: Time4U server
 Name: time4u-server
 Version: ${time4u.version}
 Release: ${buildNumber}
-License: MIT
-Group: Productivity/Networking/Web/Servers
-Source: https://sourceforge.net/projects/time4u/
+License: OSL
+Source: http://sourceforge.net/projects/sudosh2/
 BuildArch: noarch
-Requires: java-1_6_0-sun-devel 
-BuildRoot: /tmp/time4u
+BuildRoot: /tmp/sudosh
 %description
 This contains everything to run a basic Time4U server.
 
