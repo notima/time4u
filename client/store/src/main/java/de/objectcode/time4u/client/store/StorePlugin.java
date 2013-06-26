@@ -40,10 +40,6 @@ public class StorePlugin extends Plugin
   {
     super.start(context);
     plugin = this;
-    final IDatabaseBackend databaseBackend = StoreBackendPlugin.getDefault().getDatabaseBackend();
-
-    m_repository = new HibernateRepository(databaseBackend, getStateLocation().toFile());
-    m_metaRepository = new MetaRepository();
   }
 
   /**
@@ -79,12 +75,30 @@ public class StorePlugin extends Plugin
 
   public IRepository getRepository()
   {
+	  if (m_repository == null )
+		  initialize();
     return m_repository;
   }
 
   public MetaRepository getMetaRepository()
   {
+	  if (m_metaRepository == null )
+		  initialize();
+		  
     return m_metaRepository;
   }
 
+  private synchronized void initialize() {
+	  if ( m_metaRepository != null )
+		  return;
+	  try {
+	    final IDatabaseBackend databaseBackend = StoreBackendPlugin.getDefault().getDatabaseBackend();
+
+	    m_repository = new HibernateRepository(databaseBackend, getStateLocation().toFile());
+	    m_metaRepository = new MetaRepository();
+	  } catch ( Exception e ) {
+		  log(e);
+	  }
+				  
+  }
 }

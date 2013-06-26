@@ -301,7 +301,7 @@
          </property>
          <property
                name="windowImages"
-               value="/time4u-client-ui/icons/Time4U.gif,/time4u-client-ui/icons/Time4U_32.gif,/time4u-client-ui/icons/Time4U_48.gif,/time4u-client-ui/icons/Time4U_64.gif,/time4u-client-ui/icons/Time4U_128.gif">
+               value="icons/Time4U.gif,icons/Time4U_32.gif,icons/Time4U_48.gif,icons/Time4U_64.gif,icons/Time4U_128.gif">
          </property>
          <property
                name="startupForegroundColor"

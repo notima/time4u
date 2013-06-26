@@ -7,6 +7,6 @@ Bundle-Activator: de.objectcode.time4u.client.store.backend.StoreBackendPlugin
 Bundle-Vendor: objectcode.de
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: de.objectcode.time4u.client.store.backend

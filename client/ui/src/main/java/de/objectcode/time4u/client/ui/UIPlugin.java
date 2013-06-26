@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -71,7 +72,11 @@ public class UIPlugin extends AbstractUIPlugin
     plugin = this;
 
     m_activeWorkItemJob = new ActiveWorkItemJob();
-    m_activeWorkItemJob.schedule(1000L);
+    new Thread(new Runnable() {
+		public void run() {
+		    m_activeWorkItemJob.schedule(1000L);
+		}
+    }).start();
   }
 
   /**
