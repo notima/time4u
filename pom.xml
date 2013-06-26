@@ -12,7 +12,7 @@
 	</modules>
 	<scm>
 		<connection>scm:svn:svn+ssh://svn.code.sf.net/p/time4u/code/trunk</connection>
-		<developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/time4u/code/trunk/trunk</developerConnection>
+		<developerConnection>scm:svn:svn+ssh://svn.code.sf.net/p/time4u/code/trunk</developerConnection>
 		<url>http://time4u.svn.sourceforge.net/viewvc/time4u/trunk</url>
 	</scm>
 	<distributionManagement>
