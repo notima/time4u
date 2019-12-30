@@ -2,4 +2,5 @@
 
 ```
 mvn -DstripQualifier=true eclipse:to-maven
+mvn clean install
 ```
