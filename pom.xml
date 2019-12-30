@@ -61,38 +61,24 @@
 			<name>JBoss repository for Maven 2</name>
 			<url>http://repository.jboss.org/nexus/content/repositories/public/</url>
 		</repository>
-		<!-- repository>
-			<id>maven-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven 1</name>
-			<url>http://download.java.net/maven/1/</url>
-			<layout>legacy</layout>
-		</repository -->
+		<repository>
+			<id>openmind</id>
+			<name>OpenMind</name>
+			<url>http://repository.openmindonline.it/</url>
+		</repository>
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Repository for Maven 2</name>
 			<url>http://download.java.net/maven/2/</url>
 		</repository>
 		<repository>
-			<id>codehaus-releases</id>
-			<name>codehaus-releases</name>
-			<url>https://nexus.codehaus.org/content/groups/public</url>
-			<!--url>http://repository.codehaus.org</url-->			
+			<id>jabylon</id>
+			<name>Jabylon</name>
+			<url>http://www.jabylon.org/maven/</url>
 		</repository>
-		<repository>
-			<id>codehaus-snapshots</id>
-			<name>codehaus-snapshots</name>
-			<!--url>http://snapshots.repository.codehaus.org</url-->
-			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>			
-		</repository>
+
+
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>codehaus-snapshots</id>
-			<name>codehaus-snapshots</name>
-			<url>https://nexus.codehaus.org/content/groups/snapshots-group</url>
-			<!--url>http://snapshots.repository.codehaus.org</url-->			
-		</pluginRepository>
-	</pluginRepositories>
 	<properties>
 		<gwt.version>2.0.0</gwt.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
