@@ -48,7 +48,7 @@
 			<outputFileNameMapping>
 				${artifact.artifactId}_${artifact.version}.${artifact.extension}
 			</outputFileNameMapping>
-			<outputDirectory>features/de.objectcode.time4u.client.feature_${pom.version}</outputDirectory>
+			<outputDirectory>features/de.objectcode.time4u.client.feature_${project.version}</outputDirectory>
 			<unpack>true</unpack>
 			<includes>
 				<include>de.objectcode.time4u.client:de.objectcode.time4u.client.feature:jar:feature

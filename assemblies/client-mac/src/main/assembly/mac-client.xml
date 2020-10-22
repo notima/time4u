@@ -56,7 +56,7 @@
 				${artifact.artifactId}_${artifact.version}.${artifact.extension}
 			</outputFileNameMapping>
 			<outputDirectory>
-				Time4U.app/Contents/Resources/Java/features/de.objectcode.time4u.client.feature_${pom.version}
+				Time4U.app/Contents/Resources/Java/features/de.objectcode.time4u.client.feature_${project.version}
 			</outputDirectory>
 			<unpack>true</unpack>
 			<includes>

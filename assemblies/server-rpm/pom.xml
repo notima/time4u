@@ -13,7 +13,7 @@
 		<dependency>
 			<groupId>de.objectcode.time4u.assemblies</groupId>
 			<artifactId>time4u-assemblies-deploy</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<type>tar.bz2</type>
 		</dependency>
 	</dependencies>

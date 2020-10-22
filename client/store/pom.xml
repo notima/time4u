@@ -21,12 +21,12 @@
 		<dependency>
 			<groupId>de.objectcode.time4u.server</groupId>
 			<artifactId>time4u-server-entities</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.store.backend</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
