@@ -13,43 +13,43 @@
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.store</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.store.backend</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.store.derby</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.connection</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.connection.ui</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.ui</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>de.objectcode.time4u.client</groupId>
 			<artifactId>de.objectcode.time4u.client.feature</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<classifier>feature</classifier>
 		</dependency>
 
