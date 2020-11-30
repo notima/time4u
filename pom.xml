@@ -74,7 +74,7 @@
 		<repository>
 			<id>jabylon</id>
 			<name>Jabylon</name>
-			<url>http://www.jabylon.org/maven/</url>
+			<url>https://www.jabylon.org/maven/</url>
 		</repository>
 
 
